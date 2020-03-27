@@ -2,31 +2,58 @@ import Vue from 'vue'
 import VueRouter from 'vue-router'
 import Login from './../components/login.vue'
 import Home from './../components/home.vue'
+import Welcome from './../components/welcome.vue'
+import CaseSingle from './../components/case/single.vue'
+import CaseGroup from './../components/case/group.vue'
+import CaseDatabase from './../components/case/database.vue'
+import ProjectSingle from './../components/project/single.vue'
+import ProjectGroup from './../components/project/group.vue'
+import CaseConfigParams from './../components/caseConfig/params.vue'
+import CaseConfigComponent from './../components/caseConfig/component.vue'
+import CaseConfigDateSource from './../components/caseConfig/dataSource.vue'
+import TaskJob from './../components/task/job.vue'
+import TaskReport from './../components/task/report.vue'
+import UtilsFirst from './../components/utils/first.vue'
+import UtilsSecond from './../components/utils/second.vue'
+import ConfigUser from './../components/config/user.vue'
+import ConfigPermission from './../components/config/permission.vue'
+
+
 
 Vue.use(VueRouter)
 
 const routes = [
-  // {
-  //   path: '/',
-  //   name: 'Home',
-  //   component: Home
-  // },
-  // {
-  //   path: '/about',
-  //   name: 'About',
-  //   // route level code-splitting
-  //   // this generates a separate chunk (about.[hash].js) for this route
-  //   // which is lazy-loaded when the route is visited.
-  //   component: () => import(/* webpackChunkName: "about" */ '../views/About.vue')
-  // }
+
   {
     path: '/login', component: Login
   },
   {
-    path: '/', redirect:'/login'
+    path: '/', redirect:'/home'
   },
   {
-    path: '/home',component: Home
+    path: '/home',component: Home,redirect :'/welcome',
+      children:[
+        {path:'/welcome',component:Welcome},
+        {path: '/case/single',component:CaseSingle},
+        {path: '/case/group',component:CaseGroup},
+        {path: '/case/database',component:CaseDatabase},
+
+        {path: '/project/single',component:ProjectSingle},
+        {path: '/project/group',component:ProjectGroup},
+
+        {path: '/caseConfig/params',component:CaseConfigParams},
+        {path: '/caseConfig/component',component:CaseConfigComponent},
+        {path: '/caseConfig/dataSource',component:CaseConfigDateSource},
+
+        {path: '/task/job',component:TaskJob},
+        {path: '/task/report',component:TaskReport},
+
+        {path: '/utils/first',component:UtilsFirst},
+        {path: '/utils/second',component:UtilsSecond},
+
+        {path: '/config/user',component:ConfigUser},
+        {path: '/config/permission',component:ConfigPermission},
+      ]
   }
 ]
 
@@ -41,9 +68,9 @@ const router = new VueRouter({
 router.beforeEach((to, from , next) => {
   // 登录页不拦截，直接放行
   if(to.path === '/login') return next();
-  const token = window.sessionStorage.getItem("token");
+  const token = window.localStorage.getItem("token");
   if(!token) return next('/login');
-  next();
+  next(); 
 })
 
 export default router
