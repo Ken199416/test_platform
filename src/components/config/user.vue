@@ -12,20 +12,16 @@
       <el-row :gutter="10">
         <el-col :span="4">
           <el-input
+            @keyup.enter.native="getUserList()"
             placeholder="请输入用户名"
             v-model="queryUserListParams.query"
             clearable
             @clear="getUserList()"
           >
-            <el-button
-              @keyup.enter.native="getUserList()"
-              slot="append"
-              icon="el-icon-search"
-              @click="getUserList()"
-            ></el-button>
+            <el-button slot="append" icon="el-icon-search" @click="getUserList()"></el-button>
           </el-input>
         </el-col>
-        <el-col :span="4">
+        <el-col :span="20" style="text-align:right">
           <!-- <el-button type="primary">添加</el-button> -->
           <el-button type="primary" @click="addDialogVisible = true">添加用户</el-button>
         </el-col>
@@ -44,36 +40,46 @@
         <!-- 状态按钮 -->
         <el-table-column fixed="right" label="状态" width="70">
           <template slot-scope="scope">
-            <el-switch v-model="scope.row.del" @change="changeDel(scope.row)"></el-switch>
+            <el-tooltip
+              v-if="scope.row.del"
+              class="item"
+              effect="dark"
+              content="停用该用户"
+              placement="top"
+              :enterable="false"
+            >
+              <el-switch v-model="scope.row.del" @change="changeDel(scope.row)"></el-switch>
+            </el-tooltip>
+            <el-tooltip
+              v-else
+              class="item"
+              effect="dark"
+              content="恢复该用户"
+              placement="top"
+              :enterable="false"
+            >
+              <el-switch v-model="scope.row.del" @change="changeDel(scope.row)"></el-switch>
+            </el-tooltip>
           </template>
         </el-table-column>
         <!-- 操作列 -->
         <el-table-column fixed="right" label="操作" width="180">
           <template slot-scope="scope">
-            <el-tooltip
-              class="item"
-              effect="dark"
-              content="编辑用户资料"
-              placement="top"
-              :enterable="false"
-            >
-              <el-button
-                type="primary"
-                icon="el-icon-edit"
-                @click="showDialogVisible(scope.row)"
-                size="mini"
-              >编辑</el-button>
-            </el-tooltip>
+            <el-button
+              type="primary"
+              icon="el-icon-edit-outline"
+              @click="showDialogVisible(scope.row)"
+              size="mini"
+            >编辑</el-button>
+            <!-- </el-tooltip> -->
 
-            <el-tooltip
-              class="item"
-              effect="dark"
-              content="查看用户详细资料"
-              placement="top"
-              :enterable="false"
-            >
-              <el-button type="primary" icon="el-icon-user" size="mini">详情</el-button>
-            </el-tooltip>
+            <el-button
+              type="primary"
+              icon="el-icon-user"
+              size="mini"
+              @click="getUserInfo(scope.row.id)"
+            >详情</el-button>
+            <!-- </el-tooltip> -->
           </template>
         </el-table-column>
       </el-table>
@@ -88,10 +94,11 @@
         layout="total, sizes, prev, pager, next, jumper"
         :total="userTotal"
       ></el-pagination>
+      
     </el-card>
 
     <!-- 添加用户的对话框 -->
-    <el-dialog title="用户添加" :visible.sync="addDialogVisible" width="50%" @close="closeAdd()">
+    <el-dialog :close-on-click-modal="false" title="用户添加" :visible.sync="addDialogVisible" width="50%" @close="closeAdd()">
       <span></span>
       <!-- 添加用户表单 -->
       <el-form ref="addFormRef" :rules="addFormRules" :model="addForm" label-width="70px">
@@ -115,15 +122,15 @@
           prop="customerName"
         >
           <el-input
-            prefix-icon="el-icon-user"
+            prefix-icon="el-icon-user-solid"
             v-model="addForm.customerName"
             placeholder="请输入昵称（仅为一个名字标识）"
             style="width:93%"
           ></el-input>
         </el-form-item>
         <el-form-item style="margin-left:150px;margin-right:150px" label="密码" prop="password">
-          <el-input
-            prefix-icon="el-icon-lock"
+          <el-input type="password"
+            prefix-icon="el-icon-key"
             v-model="addForm.password"
             placeholder="请输入密码"
             style="width:93%"
@@ -131,7 +138,7 @@
         </el-form-item>
         <el-form-item style="margin-left:150px;margin-right:150px" label="手机" prop="mobile">
           <el-input
-            prefix-icon="el-icon-lock"
+            prefix-icon="el-icon-mobile-phone"
             v-model="addForm.mobile"
             placeholder="请输入手机号"
             style="width:93%"
@@ -139,7 +146,7 @@
         </el-form-item>
         <el-form-item style="margin-left:150px;margin-right:150px" label="邮箱" prop="email">
           <el-input
-            prefix-icon="el-icon-lock"
+            prefix-icon="el-icon-message"
             v-model="addForm.email"
             placeholder="请输入邮箱"
             style="width:93%"
@@ -147,7 +154,7 @@
         </el-form-item>
         <el-form-item style="margin-left:150px;margin-right:150px" label="地址" prop="address">
           <el-input
-            prefix-icon="el-icon-lock"
+            prefix-icon="el-icon-map-location"
             v-model="addForm.address"
             placeholder="请输入地址"
             style="width:93%"
@@ -155,7 +162,7 @@
         </el-form-item>
         <el-form-item style="margin-left:150px;margin-right:150px" label="公司" prop="company">
           <el-input
-            prefix-icon="el-icon-lock"
+            prefix-icon="el-icon-office-building"
             v-model="addForm.company"
             placeholder="请输入所在公司"
             style="width:93%"
@@ -163,7 +170,7 @@
         </el-form-item>
         <el-form-item style="margin-left:150px;margin-right:150px" label="部门" prop="department">
           <el-input
-            prefix-icon="el-icon-lock"
+            prefix-icon="el-icon-monitor"
             v-model="addForm.department"
             placeholder="请输入所在部门"
             style="width:93%"
@@ -178,7 +185,7 @@
     </el-dialog>
 
     <!-- 修改用户弹窗 -->
-    <el-dialog title="用户编辑" :visible.sync="editDialogVisible" width="50%" @close="closeEdit()">
+    <el-dialog :close-on-click-modal="false"  title="用户编辑" :visible.sync="editDialogVisible" width="50%" @close="closeEdit()">
       <span></span>
       <!-- 修改用户表单 -->
 
@@ -204,7 +211,7 @@
           prop="customerName"
         >
           <el-input
-            prefix-icon="el-icon-user"
+            prefix-icon="el-icon-user-solid"
             v-model="editForm.customerName"
             placeholder="请输入昵称（仅为一个名字标识）"
             style="width:93%"
@@ -212,7 +219,7 @@
         </el-form-item>
         <el-form-item style="margin-left:150px;margin-right:150px" label="手机" prop="mobile">
           <el-input
-            prefix-icon="el-icon-lock"
+            prefix-icon="el-icon-mobile-phone"
             v-model="editForm.mobile"
             placeholder="请输入手机号"
             style="width:93%"
@@ -220,7 +227,7 @@
         </el-form-item>
         <el-form-item style="margin-left:150px;margin-right:150px" label="邮箱" prop="email">
           <el-input
-            prefix-icon="el-icon-lock"
+            prefix-icon="el-icon-message"
             v-model="editForm.email"
             placeholder="请输入邮箱"
             style="width:93%"
@@ -228,7 +235,7 @@
         </el-form-item>
         <el-form-item style="margin-left:150px;margin-right:150px" label="地址" prop="address">
           <el-input
-            prefix-icon="el-icon-lock"
+            prefix-icon="el-icon-map-location"
             v-model="editForm.address"
             placeholder="请输入地址"
             style="width:93%"
@@ -236,7 +243,7 @@
         </el-form-item>
         <el-form-item style="margin-left:150px;margin-right:150px" label="公司" prop="company">
           <el-input
-            prefix-icon="el-icon-lock"
+            prefix-icon="el-icon-office-building"
             v-model="editForm.company"
             placeholder="请输入所在公司"
             style="width:93%"
@@ -244,7 +251,7 @@
         </el-form-item>
         <el-form-item style="margin-left:150px;margin-right:150px" label="部门" prop="department">
           <el-input
-            prefix-icon="el-icon-lock"
+            prefix-icon="el-icon-monitor"
             v-model="editForm.department"
             placeholder="请输入所在部门"
             style="width:93%"
@@ -253,10 +260,12 @@
       </el-form>
       <!-- 添加底部区域 -->
       <span slot="footer" class="dialog-footer">
-        <el-button @click="addDialogVisible = false">取 消</el-button>
+        <el-button @click="editDialogVisible = false">取 消</el-button>
         <el-button type="primary" @click="editUser()">确 定</el-button>
       </span>
     </el-dialog>
+    <router-view></router-view>
+    
   </div>
 </template>
 <script>
@@ -334,7 +343,7 @@ export default {
           { validator: checkMobile, trigger: "blur" }
         ],
         email: [
-          { required: true, message: "请输入您的手机号", trigger: "blur" },
+          { required: true, message: "请输入您的邮箱地址", trigger: "blur" },
           { validator: checkEmail, trigger: "blur" }
         ],
         address: [
@@ -472,13 +481,13 @@ export default {
       });
     },
     showDialogVisible(user) {
-      console.log(user);
+      // console.log(user);
       this.editForm = user;
       this.editDialogVisible = true;
     },
     // 发送修改用户的请求
     async editUser() {
-      console.log(this.editForm);
+      // console.log(this.editForm);
       this.$refs.editFormRef.validate(async valid => {
         if (valid) {
           const { data: response } = await this.$http.post(
@@ -498,6 +507,18 @@ export default {
     },
     closeEdit() {
       this.$refs.editFormRef.resetFields();
+    },
+    getUserInfo(uid) {
+      console.log("查看详情");
+      this.$alert("用户详情优化功能正在路上，敬请期待...", "工程师开发中...", {
+        confirmButtonText: "确定",
+        callback: action => {
+          // 点击确定回调
+        }
+      });
+      //尚未开发，开发后会跳转到以下页面
+      // console.log("uid："+uid);
+      // this.$router.push('/config/user/userInfo/'+uid);
     }
   },
   created() {

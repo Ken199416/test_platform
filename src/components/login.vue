@@ -12,7 +12,7 @@
                     </el-form-item>
 
                      <el-form-item label="密码" prop="password">
-                        <el-input @keyup.enter.native="login()" type="password" prefix-icon="el-icon-lock" v-model="form.password" placeholder="请输入密码"></el-input>
+                        <el-input @keyup.enter.native="login()" type="password" prefix-icon="el-icon-key" v-model="form.password" placeholder="请输入密码"></el-input>
                     </el-form-item>
                     <el-form-item class="btns">
                         <el-button type="primary" @click="login()" >登录</el-button>
@@ -66,6 +66,7 @@ export default {
                         this.$message.success(data.msg);
                         // console.log("token ： " + data.data.id);
                         window.localStorage.setItem("token",data.data.id);
+                        window.localStorage.setItem("customerName",data.data.customerName);
                         this.$router.push('/home');
                     }else{
                         this.$message.error(data.msg);                    }

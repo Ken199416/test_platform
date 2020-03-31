@@ -17,6 +17,9 @@ import UtilsFirst from './../components/utils/first.vue'
 import UtilsSecond from './../components/utils/second.vue'
 import ConfigUser from './../components/config/user.vue'
 import ConfigPermission from './../components/config/permission.vue'
+import ConfigUserInfo from './../components/config/user/userInfo.vue'
+import ExecuteRecoding from './../components/case/executeRecoding.vue'
+
 
 
 
@@ -37,6 +40,7 @@ const routes = [
         {path: '/case/single',component:CaseSingle},
         {path: '/case/group',component:CaseGroup},
         {path: '/case/database',component:CaseDatabase},
+        {path: '/case/executeRecoding/:cid',component:ExecuteRecoding,props: true},
 
         {path: '/project/single',component:ProjectSingle},
         {path: '/project/group',component:ProjectGroup},
@@ -53,6 +57,8 @@ const routes = [
 
         {path: '/config/user',component:ConfigUser},
         {path: '/config/permission',component:ConfigPermission},
+        {path: '/config/user/userInfo/:uid',component:ConfigUserInfo,props: true}
+
       ]
   }
 ]

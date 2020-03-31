@@ -1,13 +1,14 @@
 <template>
     <div>
-        <h1>Welcome</h1>
+        用户ID：{{uid}}
     </div>    
 </template>
 <script>
 export default {
+    props: ['uid']
     
 }
 </script>
-<style lang="less" scoped>
+><style lang="stylus" scoped>
 
 </style>
