@@ -44,7 +44,7 @@
 
       <el-table :data="recoding" border height="670" style="width: 100%">
         <el-table-column fixed type="index" label="#" width="50px"></el-table-column>
-        <el-table-column prop="name" label="用例名称" width="200"></el-table-column>
+        <el-table-column prop="name" label="用例名称" width="150"></el-table-column>
         <el-table-column prop="time" label="执行时间" width="150"></el-table-column>
         <el-table-column prop="executeResult" label="执行结果" width="100">
           <template slot-scope="scope">
@@ -52,7 +52,7 @@
             <el-tag v-if="scope.row.executeResult==0" type="danger">FAIL</el-tag>
           </template>
         </el-table-column>
-        <el-table-column prop="protocolId" label="请求方式" width="100">
+        <el-table-column prop="protocolId" label="请求方式" width="75">
           <template slot-scope="scope">
             <el-tag v-if="scope.row.protocolId==1" type="success">GET</el-tag>
             <el-tag v-if="scope.row.protocolId==2" type="danger">POST</el-tag>
@@ -60,11 +60,11 @@
         </el-table-column>
         <el-table-column prop="url" label="请求URL" width="200"></el-table-column>
         <el-table-column prop="getParams" label="请求参数" width="200"></el-table-column>
-        <el-table-column prop="assertFlag" label="断言标志" width="200"></el-table-column>
-        <el-table-column prop="assertContent" label="预期断言" width="200"></el-table-column>
-        <el-table-column prop="executeResponse" label="接口响应" width="400"></el-table-column>
+        <el-table-column prop="assertFlag" label="断言标志" width="150"></el-table-column>
+        <el-table-column prop="assertContent" label="预期断言" width="150"></el-table-column>
+        <el-table-column prop="executeResponse" label="接口响应" width="300"></el-table-column>
 
-        <el-table-column prop="username" label="执行人" width="150"></el-table-column>
+        <el-table-column prop="username" label="执行人" width="95"></el-table-column>
 
         
       </el-table>

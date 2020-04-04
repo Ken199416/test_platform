@@ -6,6 +6,9 @@ import './plugins/element.js'
 import './assets/css/global.css'
 // 导入
 import axios from 'axios'
+// 导入通用js
+import common from './CommonFunction/common.js'
+import global from './CommonFunction/global.vue'
 axios.defaults.baseURL = 'http://127.0.0.1:8888/autoTest/platform'
 axios.interceptors.request.use(config => {
   /*判断token存在   登录拦截*/
@@ -16,6 +19,8 @@ axios.interceptors.request.use(config => {
   return config;
 });
 Vue.prototype.$http = axios
+Vue.prototype.$common = common
+Vue.prototype.$global = global
 Vue.config.productionTip = false
 
 new Vue({

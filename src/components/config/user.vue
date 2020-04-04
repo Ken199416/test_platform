@@ -290,21 +290,23 @@ export default {
       callback(new Error("请输入正确的手机号"));
     };
     return {
-      // 获取用户列表
+      // 获取用户列表请求参数
       queryUserListParams: {
         query: "",
         pageNum: 1,
         pageSize: 10
       },
+      // 删除用户请求参数
       delUserParam: {
         uid: 0,
         flag: true
       },
+      // 用户列表和用户查询出的用户总数
       userList: [],
       userTotal: 0,
       //   Dialogd对话框的展开标识
       addDialogVisible: false,
-      //   添加用户表单规则
+      //   添加用户表单参数
       addForm: {
         id: 0,
         username: "",
@@ -316,7 +318,7 @@ export default {
         department: "",
         customerName: ""
       },
-      //   修改用户信息
+      //   修改用户信息表单参数
       editForm: {
         username: "",
         mobile: "",
@@ -369,6 +371,7 @@ export default {
     };
   },
   methods: {
+    // 查询用户列表
     async getUserList() {
       const { data: response } = await this.$http.get("/queryUser", {
         params: this.queryUserListParams
@@ -382,6 +385,7 @@ export default {
         // console.log(this.userList);
       }
     },
+    // 停用用户
     async delUser(row) {
       this.delUserParam.uid = row.id;
       this.delUserParam.flag = row.del;
@@ -404,11 +408,9 @@ export default {
       }
       this.getUserList();
     },
-    // handleClick(row) {
-    //   console.log(row);
-    // },
+    // 改变用户状态
     async changeDel(row) {
-      // 停用
+      // 停用用户操作
       if (!row.del) {
         await this.$confirm("是否停用该用户?", "提示", {
           confirmButtonText: "停用",
@@ -480,14 +482,13 @@ export default {
         }
       });
     },
+    // 打开修改用户弹窗，之后需要优化成先调用后端再赋值的逻辑
     showDialogVisible(user) {
-      // console.log(user);
       this.editForm = user;
       this.editDialogVisible = true;
     },
     // 发送修改用户的请求
     async editUser() {
-      // console.log(this.editForm);
       this.$refs.editFormRef.validate(async valid => {
         if (valid) {
           const { data: response } = await this.$http.post(
@@ -505,9 +506,11 @@ export default {
         }
       });
     },
+    // 关闭用户修改用户弹窗触发的操作
     closeEdit() {
       this.$refs.editFormRef.resetFields();
     },
+    // 查看用户详情
     getUserInfo(uid) {
       console.log("查看详情");
       this.$alert("用户详情优化功能正在路上，敬请期待...", "工程师开发中...", {

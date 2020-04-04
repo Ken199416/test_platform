@@ -19,6 +19,7 @@ import ConfigUser from './../components/config/user.vue'
 import ConfigPermission from './../components/config/permission.vue'
 import ConfigUserInfo from './../components/config/user/userInfo.vue'
 import ExecuteRecoding from './../components/case/executeRecoding.vue'
+import EditComponent from './../components/caseConfig/components/httpComponent.vue'
 
 
 
@@ -48,6 +49,10 @@ const routes = [
         {path: '/caseConfig/params',component:CaseConfigParams},
         {path: '/caseConfig/component',component:CaseConfigComponent},
         {path: '/caseConfig/dataSource',component:CaseConfigDateSource},
+        {path: '/case/editComponent/:cid',component:EditComponent,props:true},
+        
+
+
 
         {path: '/task/job',component:TaskJob},
         {path: '/task/report',component:TaskReport},
@@ -58,6 +63,7 @@ const routes = [
         {path: '/config/user',component:ConfigUser},
         {path: '/config/permission',component:ConfigPermission},
         {path: '/config/user/userInfo/:uid',component:ConfigUserInfo,props: true}
+        
 
       ]
   }

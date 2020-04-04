@@ -27,9 +27,9 @@
           <el-select clearable v-model="queryComponentListParams.projectId" placeholder="请选择所属项目">
             <el-option
               v-for="item in projectOptions"
-              :key="item.value"
-              :label="item.label"
-              :value="item.value"
+              :key="item.id"
+              :label="item.name"
+              :value="item.id"
             ></el-option>
           </el-select>
         </el-col>
@@ -48,36 +48,33 @@
             <el-button icon="el-icon-search" @click="getComponentListBySelect()"></el-button>
           </el-col>
         <el-col :span="12" style="text-align:right">
-          <!-- <el-button type="primary">添加</el-button> -->
           <el-button type="primary" @click="addComponentGo()">添加组件</el-button>
         </el-col>
       </el-row>
 
       <!-- 列表区域 -->
-      <el-table :data="componentList" border height="670" style="width: 100%">
+      <el-table :data="componentList" border  style="width: 100%">
                 <el-table-column fixed type="index" label="#" width="50px"></el-table-column>
         <el-table-column prop="name" label="组件名称" width="200"></el-table-column>
-        <el-table-column prop="projectId" label="所属项目" width="200">
+        <el-table-column prop="projectName" label="所属项目" width="200">
           <template slot-scope="scope">
-            <el-tag v-if="scope.row.projectId==1" type="warning">订单项目</el-tag>
-            <el-tag v-if="scope.row.projectId==2" type="warning">商品项目</el-tag>
+            <el-tag  type="warning">{{scope.row.projectName}}</el-tag>
           </template>
         </el-table-column>
-        <el-table-column prop="categoryId" label="组件类别" width="200">
+        <el-table-column prop="categoryName" label="组件类别" width="200">
           <template slot-scope="scope">
-            <el-tag v-if="scope.row.categoryId==1" type="success">获取登录Token</el-tag>
-            <el-tag v-if="scope.row.protocolId==2" type="danger">POST</el-tag>
+            <el-tag  type="danger">{{scope.row.categoryName}}</el-tag>
           </template>
         </el-table-column>
-        <el-table-column prop="url" label="请求url" width="350"></el-table-column>
-        <el-table-column prop="params" label="请求参数" width="400"></el-table-column>
-        <el-table-column prop="assertCategoryId" label="获取来源" width="100">
+        <el-table-column prop="componentDescribe" label="组件描述" width="570"></el-table-column>
+        <!-- <el-table-column prop="url" label="请求url" width="350"></el-table-column>
+        <el-table-column prop="params" label="请求参数" width="400"></el-table-column>-->
+         <!-- <el-table-column prop="assertCategoryId" label="获取来源" width="100"> 
           <template slot-scope="scope">
             <el-tag v-if="scope.row.assertCategoryId==1" type="success">headers</el-tag>
             <el-tag v-if="scope.row.assertCategoryId==2" type="danger">cookies</el-tag>
           </template>
-        </el-table-column>  
-        <!-- <el-table-column prop="assertContent" label="断言内容" width="200"></el-table-column> -->
+        </el-table-column>   -->
         <!-- 状态按钮 -->
         <el-table-column fixed="right" label="状态" width="100">
           <template slot-scope="scope">
@@ -92,51 +89,34 @@
               <el-switch v-model="scope.row.del" @change="changeDel(scope.row)"></el-switch>
             </el-tooltip>
             <el-tooltip
-              v-else
+                v-else
               class="item"
               effect="dark"
               content="继续使用该组件"
               placement="top"
               :enterable="false"
             >
-              <el-switch v-model="scope.row.del" @change="changeDel(scope.row)"></el-switch>
+              <el-switch  v-model="scope.row.del" @change="changeDel(scope.row)"></el-switch>
             </el-tooltip>
           </template>
         </el-table-column>
         <!-- 操作列 -->
-        <!-- <el-table-column fixed="right" label="操作" width="240">
+        <el-table-column fixed="right" label="操作" width="300">
           <template slot-scope="scope">
             <el-button
               type="primary"
               icon="el-icon-edit-outline"
-              @click="showDialogVisible(scope.row)"
+              @click="toEditComponent(scope.row.id)"
               size="mini"
-            >编辑</el-button>
+            >编辑组件</el-button>
             <el-button
               type="primary"
               icon="el-icon-video-play"
               size="mini"
-              @click="runCaseById(scope.row.id)"
-            >执行</el-button>
-
-
-            <el-tooltip
-              class="item"
-              effect="dark"
-              content="查看用例执行记录"
-              placement="top"
-              :enterable="false"
-            >
-              <el-button
-              size="mini"
-              icon="el-icon-view"
-              @click="getExecuteRecoding(scope.row.id)"
-            ></el-button>
-            </el-tooltip>
-            
-
+              @click="toComponentInfo(scope.row.id)"
+            >查看组件详情</el-button>
           </template>
-        </el-table-column> -->
+        </el-table-column>
       </el-table>
 
       <!-- 分页区域 -->
@@ -190,15 +170,15 @@
           <el-select style="width:93%" v-model="addComponentForm.projectId" placeholder="请选择项目">
             <el-option
               v-for="item in projectOptions"
-              :key="item.value"
-              :label="item.label"
-              :value="item.value"
+              :key="item.id"
+              :label="item.name"
+              :value="item.id"
             ></el-option>
           </el-select>
         </el-form-item>
 
 
-        <el-form-item style="margin-left:150px;margin-right:150px" label="请求地址" prop="url">
+        <el-form-item v-if="addComponentForm.categoryId==1" style="margin-left:150px;margin-right:150px" label="请求地址" prop="url">
           <el-input 
             prefix-icon="el-icon-discover"
             v-model="addComponentForm.url"
@@ -209,7 +189,7 @@
      
 
 
-        <el-form-item style="margin-left:150px;margin-right:150px" label="请求参数" prop="params">
+        <el-form-item v-if="addComponentForm.categoryId==1" style="margin-left:150px;margin-right:150px" label="请求参数" prop="params">
           <el-input type="textarea" :rows="5"
             prefix-icon="el-icon-key"
             v-model="addComponentForm.params"
@@ -218,13 +198,98 @@
           ></el-input>
         </el-form-item>
 
+
+
+        <el-form-item v-if="addComponentForm.categoryId==4" style="margin-left:150px;margin-right:150px" label="数据源" prop="dataSourceId">
+          <el-select style="width:93%" v-model="addComponentForm.dataSourceId" placeholder="请选择数据源">
+            <el-option
+              v-for="item in dataSourceList"
+              :key="item.id"
+              :label="item.name"
+              :value="item.id"
+            ></el-option>
+          </el-select>
+        </el-form-item>
+
+
+
+
+         <el-form-item v-if="addComponentForm.categoryId==4" style="margin-left:150px;margin-right:150px" label="SQL语句" prop="sqlContent">
+          <el-input type="textarea" :rows="5"
+            prefix-icon="el-icon-key"
+            v-model="addComponentForm.sqlContent"
+            placeholder="请输入SQL语句，建议查询结果只有一条记录，即使有多条，断言只会取第一条记录"
+            style="width:93%"
+          ></el-input>
+        </el-form-item>
+
+        <el-form-item style="margin-left:150px;margin-right:150px" label="组件描述" prop="componentDescribe">
+          <el-input 
+            prefix-icon="el-icon-discover"
+            v-model="addComponentForm.componentDescribe"
+            placeholder="请输入获取组件描述"
+            style="width:93%"
+          ></el-input>
+        </el-form-item>
+
       </el-form>
       <!-- 添加底部区域 -->
       <span slot="footer" class="dialog-footer">
         <el-button @click="addComponentDialogVisible = false">取 消</el-button>
-        <el-button type="primary" @click="getTokenResponse()">下一步</el-button>
+        <el-button v-if="addComponentForm.categoryId==1" type="primary" @click="getTokenResponse()">下一步</el-button>
+        <el-button v-if="addComponentForm.categoryId==4" type="primary" @click="getSQLDate()">下一步</el-button>
       </span>
     </el-dialog>
+
+
+
+<!-- sql查询结果展示窗口 -->
+<el-dialog
+  title="SQL查询器查询结果"
+  :visible.sync="SQLSelectDialogVisible"
+  width="90%"
+  :before-close="handleClose">
+    <el-table border height="600" 
+      :data="valueList"
+      style="width: 100%">
+      <el-table-column fixed type="index" label="#" width="50px"></el-table-column>
+      <el-table-column v-for="item in keyList"
+        :prop="item"
+        :label="item"
+        width="160">
+      </el-table-column>
+</el-table>
+<p style="color:red;font-size:20px">选择要断言的字段和预期结果,数据结果集最多返回50条!</p>
+<br>
+<el-form :inline="true" ref="addSQLSelectComponentFormRef" :rules="addSQLSelectComponentFormRules" :model="addSQLSelectComponentForm" >
+    <el-form-item label="断言列" prop="assertFlag">
+     <el-select style="width:250px" v-model="addSQLSelectComponentForm.assertFlag" placeholder="请选择表字段">
+            <el-option
+              v-for="item in keyList"
+              :key="item"
+              :label="item"
+              :value="item"
+            ></el-option>
+      </el-select>
+    </el-form-item>
+
+
+
+            <el-form-item  style="margin-left:25px" label="预期断言" prop="assertContent">
+          <el-input 
+            prefix-icon="el-icon-key"
+            v-model="addSQLSelectComponentForm.assertContent"
+            placeholder="请输入预期断言"
+            style="width:500px"
+          ></el-input>
+        </el-form-item>
+</el-form>
+<span slot="footer" class="dialog-footer">
+    <el-button @click="SQLSelectDialogVisible = false">取 消</el-button>
+    <el-button type="primary" @click="addSqlSelectComponent()">确 定</el-button>
+  </span>
+</el-dialog>
+
 
 
     <!-- 添加组件第二步对话框 -->
@@ -232,9 +297,7 @@
       <h1 style="color:red">请确认在以下返回的信息中有您想要的Token信息,
         当前只支持从header或者cookie中获取
       </h1>
-      <!-- header:{{lookHeaderAndResponseForm.headers}}
-      <br/>
-      response:{{lookHeaderAndResponseForm.response}} -->
+
       <!-- 添加组件表单 -->
        <el-form ref="lookHeaderAndResponseRef" :rules="lookHeaderAndResponseRules" :model="lookHeaderAndResponseForm" >
         
@@ -424,7 +487,6 @@ export default {
         del: true
       },
       componentList: [],
-      caseCount: 0,
       //   添加组件Dialogd第一步对话框的展开标识
       addComponentDialogVisible: false,
       //   添加组件第一步表单
@@ -434,8 +496,13 @@ export default {
         projectId:'',
         params: '',
         url:'',
+        dataSourceId:"",
+        assertFlag:"",
+        assertContent:"",
+        sqlContent:""
       },
       componentTotal:0,
+      dataSourceList:[],
       //   修改用户信息
       editCaseForm: {
         // id: 0,
@@ -449,6 +516,7 @@ export default {
         // assertContent: "",
         // url:''checkJson
       },
+      sqlId:"",
       //   添加组件第一步表单验证规则的对象
       addComponentFormRules: {
         name: [
@@ -466,6 +534,12 @@ export default {
         ],
         params: [
           {validator : checkJson ,  trigger: "blur"}
+        ],
+        sqlContent:[
+          { required: true, message: "请输入SQL", trigger: "blur" }
+        ],
+        dataSourceId:[
+          { required: true, message: "请选择数据源", trigger: "blur" }
         ]
 
       },
@@ -475,6 +549,7 @@ export default {
           { required: true, message: "请选择获取Token的方式", trigger: "blur" }
         ]
       },
+      addSQLSelectComponentFormRules:[],
       editFormRules:{},
       // 中间表单,用于承接第一步,第二步的数据
       middleFirstFrom:{},
@@ -490,14 +565,74 @@ export default {
       // 获取方式数据
       tokenAssertWay:{},
       // 图层加载标识
-      loading:false
-    };
+      loading:false,
+      keyList:[],
+      valueList:[],
+      SQLSelectDialogVisible:false,
+      addSQLSelectComponentFormRules:{
+        assertFlag:[
+          { required: true, message: "请选择断言列", trigger: "blur" }
+        ],
+        assertContent:[
+          { required: true, message: "请输入预期断言", trigger: "blur" }
+        ]
+
+      },
+      addSQLSelectComponentForm:{}
+    }
   },
   methods: {
+    toComponentInfo(){
+
+    },
+    toEditComponent(cid){
+      this.$router.push("/case/editComponent/"+cid);
+    },
+    addSqlSelectComponent(){
+      this.addSQLSelectComponentForm.id = this.sqlId;
+        console.log(this.addSQLSelectComponentForm);
+        this.$refs.addSQLSelectComponentFormRef.validate(async valid => {
+          if(valid){
+            const {data : response} = await this.$http.post('/editComponent',this.addSQLSelectComponentForm);
+            if(response.code == 10000){
+              this.$message.success("添加组件成功");
+              this.SQLSelectDialogVisible = false;
+              this.addComponentDialogVisible = false;
+            }else{
+              this.$message.success("添加组件失败，请稍后重试");
+            }
+          }
+        })
+
+        // this.SQLSelectDialogVisible = false;
+    },
+    handleClose(){
+        this.SQLSelectDialogVisible = false
+    },
+    async getSQLDate(){
+       this.$refs.addComponentFormRef.validate(async valid => {
+        if (valid) {
+      const {data : response} = await this.$http.post('/sqlSelect',this.addComponentForm);
+      // console.log(this.addComponentForm);
+      if(response.code == 10000){
+        this.keyList = response.data.key;
+        this.valueList = response.data.value;
+        this.sqlId = response.total;
+        this.SQLSelectDialogVisible = true;
+      }else{
+        this.$message.error(response.msg);
+      }
+        }else{
+            this.$message.error("请按照规则填写表单");
+        }
+       })  
+    },
     async addComponentGo(){
         this.addComponentDialogVisible = true;
         this.getComponentCategory();
-          
+        this.$common.getAllDataSource().then(data =>{
+          this.dataSourceList = data;
+        });
       },
 
     async getComponentCategory(){
@@ -603,7 +738,7 @@ export default {
     async delComponent(row) {
       this.delComponentParam.id = row.id;
       this.delComponentParam.del = row.del;
-      const { data: response } = await this.$http.get("/toDeComponent", {
+      const { data: response } = await this.$http.get("/toDelComponent", {
         params: this.delComponentParam
       });
       if (response.code != 10000) {
@@ -681,6 +816,7 @@ export default {
     },
     closeAddSecond() {
       this.$refs.lookHeaderAndResponseRef.resetFields();
+      this.$refs.addComponentFormRef.resetFields();
       this.textareaHigh = 4;
 
     },

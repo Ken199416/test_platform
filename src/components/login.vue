@@ -30,14 +30,10 @@
 export default {
     data(){
         return{
-            title:'自动化测试平台',
+            title:'测试平台',
             form:{
                 username:'',
                 password:''
-            },
-            testData:{
-                test:"test1",
-                desc:"desc1"
             },
             rules: {
                 username: [

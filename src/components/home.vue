@@ -5,7 +5,7 @@
     <el-header>
       <div>
         <img class="logoImg" src="../assets/img/userLogo.jpg" alt="用户头像" height="40px " />
-        <span>自动化测试平台</span>
+        <span>测试平台</span>
       </div>
       <span >
         欢迎您，
