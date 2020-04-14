@@ -5,13 +5,32 @@
     <el-header>
       <div>
         <img class="logoImg" src="../assets/img/userLogo.jpg" alt="用户头像" height="40px " />
-        <span>测试平台</span>
+        <span>
+          <strong>测试平台</strong>
+        </span>
       </div>
-      <span >
-        欢迎您，
-        <a href>{{customerName == '' ? '空昵称' : customerName}}</a>
+      <span style="margin-left:80%">
+        <el-menu
+          :default-active="activeIndex"
+          class="el-menu-demo"
+          background-color="#373d41"
+          active-text-color="while"
+          text-color="#F5F7F8"
+          mode="horizontal"
+          @select="select"
+        >
+          <el-submenu index="1">
+            <template slot="title">
+              <span style="font-size:18px;">{{customerName == '' ? '空昵称' : customerName}}</span>
+            </template>
+            <el-menu-item index="1-1">我的信息</el-menu-item>
+            <el-menu-item index="1-2">反馈问题</el-menu-item>
+            <el-menu-item index="1-3">退出</el-menu-item>
+          </el-submenu>
+        </el-menu>
       </span>
-      <el-button @click.prevent="logout()" type="info">退出</el-button>
+      <el-button type="primary" @click="toChangeProject()" >{{this.$global.currentProjectName == null ? '全平台' : this.$global.currentProjectName}}</el-button>
+      <!-- </a> -->
     </el-header>
     <!-- 主体区域 -->
     <el-container>
@@ -56,7 +75,38 @@
       </el-aside>
       <!-- 主体区域 -->
       <el-main>
-        <router-view></router-view>
+            <!-- 切换项目的抽屉 -->
+    <el-drawer :visible.sync="drawer" direction="ttb" size="400px">
+          <el-row>
+            <el-col style="margin-top:30px;margin-left:2%;margin-right:2%;" :span="3">
+              <div @click="delProject()" style="cursor:pointer">
+                <el-card style="background-color:#479DE3;height:75px;border-radius: 15px;">
+                  <div style="text-align: center;font-size:25px;font-color:while">
+                    <span>全平台</span>
+                  </div>
+                </el-card>
+              </div>
+            </el-col>
+            <el-col
+              style="margin-top:30px;margin-left:2%;margin-right:2%;"
+              :span="3"
+              :key="item.id"
+              v-for="item in projectList"
+            >
+              <div @click="changeProject(item.id,item.name)" style="cursor:pointer">
+                <el-card style="background-color:#479DE3;height:75px;border-radius: 15px;">
+                  <div style="text-align: center;font-size:25px;font-color:while">
+                    <span>{{item.name}}</span>
+                  </div>
+                </el-card>
+              </div>
+            </el-col>
+          </el-row>
+        </el-drawer>
+        <keep-alive>
+          <router-view v-if="$route.meta.keepAlive"></router-view>
+        </keep-alive>
+        <router-view v-if="!$route.meta.keepAlive"></router-view>
         <!-- 通用底部 -->
         <div style="margin-top: 50px;margin-left:45%">
           <el-button icon="el-icon-phone-outline" @click="callMe()">Author</el-button>
@@ -67,14 +117,12 @@
             placement="top"
             :enterable="false"
           >
-            <el-button icon="el-icon-info" ></el-button>
+            <el-button icon="el-icon-info"></el-button>
           </el-tooltip>
         </div>
       </el-main>
     </el-container>
   </el-container>
-
-  <!-- <el-button @click.prevent="logout()" type="info">退出</el-button> -->
 </template>
 <script>
 export default {
@@ -87,17 +135,25 @@ export default {
       aside: 200,
       toggleIcon: "el-icon-s-fold",
       currentMenu: "/project/single",
-      customerName: ""
+      customerName: "",
+      // 切换项目的抽屉标志
+      drawer: false,
+      activeIndex: "",
+      projectList: [],
+      currentProjectId: "",
+      currentProjectName: ""
     };
   },
   methods: {
-    callMe(){
+    callMe() {
       // this.$message.success("作者微信：HMJ_KEN");
       this.$alert("作者微信：HMJ_KEN");
     },
     logout() {
       window.localStorage.removeItem("token");
       window.sessionStorage.removeItem("currentMenu");
+      window.sessionStorage.removeItem("projectId");
+      window.sessionStorage.removeItem("projectName");
       this.$message.success("您已退出");
       this.$router.push("/login");
     },
@@ -128,12 +184,37 @@ export default {
     },
     getLastMenu() {
       this.currentMenu = window.sessionStorage.getItem("currentMenu");
+    },
+    async toChangeProject() {
+      this.drawer = true;
+      this.projectList = await this.$common.getAllProject();
+    },
+    changeProject(id,name){
+      window.sessionStorage.setItem("projectId",id);
+      window.sessionStorage.setItem("projectName",name);
+      location.reload();
+    },
+    delProject(){
+      window.sessionStorage.removeItem("projectId");
+      window.sessionStorage.removeItem("projectName");
+      location.reload();
+    },
+    select(index) {
+      console.log(index);
+      if (index == "1-3") {
+        this.logout();
+      }
     }
   },
   created() {
     this.getMenu();
     this.getLastMenu();
+    if(window.sessionStorage.getItem("projectId") != null && window.sessionStorage.getItem("projectName") != null){
+      this.$global.currentProjectId = window.sessionStorage.getItem("projectId");
+      this.$global.currentProjectName = window.sessionStorage.getItem("projectName");
+    }
     this.customerName = window.localStorage.getItem("customerName");
+    console.log(this.currentProjectName);
   }
 };
 </script>
@@ -141,13 +222,13 @@ export default {
 .el-header {
   background-color: #373d41;
   display: flex;
-  justify-content: space-between;
+  // justify-content: space-between;
   padding-left: 10px;
   align-items: center;
   color: linen;
-  font-size: 30px;
+  font-size: 18px;
   > span {
-    margin-left: 73%;
+    // margin-left: 0%;
     font-size: 18px;
     > a {
       color: gold;
@@ -157,7 +238,7 @@ export default {
     display: flex;
     align-items: center;
     span {
-      margin-left: 20px;
+      margin-left: 10px;
     }
   }
 }

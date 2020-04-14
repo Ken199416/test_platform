@@ -23,8 +23,20 @@
           </el-select>
         </el-col>
         <!-- 选择项目 -->
-        <el-col :span="3">
+        <el-col :span="3" v-if="this.$global.currentProjectId == null && this.$global.currentProjectName == null">
           <el-select clearable @clear="getDataSourceBySelect()" v-model="queryDataSourceListParams.projectId" placeholder="请选择所属项目">
+            <el-option
+              v-for="item in projectOptions"
+              :key="item.id"
+              :label="item.name"
+              :value="item.id"
+            ></el-option>
+          </el-select>
+        </el-col>
+
+
+        <el-col :span="3" v-else>
+          <el-select disabled clearable @clear="getDataSourceBySelect()" v-model="this.$global.currentProjectName" placeholder="请选择所属项目">
             <el-option
               v-for="item in projectOptions"
               :key="item.id"
@@ -180,13 +192,29 @@
           </el-select>
         </el-form-item>
 
-        <el-form-item
+        <el-form-item v-if="this.$global.currentProjectId == null && this.$global.currentProjectName == null"
           style="margin-left:150px;margin-right:150px"
           class="input-center"
           label="所属项目"
           prop="projectId"
         >
         <el-select style="width:93%" v-model="addDataSourceForm.projectId" placeholder="请选择所属项目">
+            <el-option
+              v-for="item in projectOptions"
+              :key="item.id"
+              :label="item.name"
+              :value="item.id"
+            ></el-option>
+          </el-select>
+        </el-form-item>
+
+        <el-form-item v-else
+          style="margin-left:150px;margin-right:150px"
+          class="input-center"
+          label="所属项目"
+          prop="projectId"
+        >
+        <el-select disabled style="width:93%" v-model="this.$global.currentProjectName" placeholder="请选择所属项目">
             <el-option
               v-for="item in projectOptions"
               :key="item.id"
@@ -233,176 +261,12 @@
       <!-- 添加底部区域 -->
       <span slot="footer" class="dialog-footer">
         <el-button @click="addDataSourceDialogVisible = false">取 消</el-button>
-        <el-button type="primary" @click="addDataSource()">下一步</el-button>
+        <el-button type="primary" @click="addDataSource()">确 定</el-button>
       </span>
     </el-dialog>
 
 
-    <!-- 添加组件第二步对话框 -->
-        <el-dialog :close-on-click-modal="false" title="获取Token确认" :visible.sync="lookHeaderAndResponseDialog" width="80%" @close="closeAddSecond()">
-      <h1 style="color:red">请确认在以下返回的信息中有您想要的Token信息,
-        当前只支持从header或者cookie中获取
-      </h1>
-      <!-- header:{{lookHeaderAndResponseForm.headers}}
-      <br/>
-      response:{{lookHeaderAndResponseForm.response}} -->
-      <!-- 添加组件表单 -->
-       <el-form ref="lookHeaderAndResponseRef" :rules="lookHeaderAndResponseRules" :model="lookHeaderAndResponseForm" >
-        
-        
-        <el-form-item style="margin-left:10px;margin-right:10px" label="响应报文" prop="response">
-          <el-input  type="textarea" :rows="5"
-            v-model="lookHeaderAndResponseForm.response"
-          ></el-input>
-        </el-form-item>
-        
-        
-        <el-form-item style="margin-left:10px;margin-right:10px" label="响应头信息" prop="headers">
-          <el-input  type="textarea" :rows="5"
-            v-model="lookHeaderAndResponseForm.headers"
-        
-          ></el-input>
-        </el-form-item>
-
-          <el-form-item style="margin-left:10px;margin-right:10px" label="响应Cookies" prop="cookies">
-          <el-input  type="textarea" :rows="5"
-            v-model="lookHeaderAndResponseForm.cookies"
-          ></el-input>
-        </el-form-item>
-
-
-
-        <el-form-item
-          style="margin-left:10px;margin-right:10px"
-          class="input-center"
-          label="获取Toekn的方式"
-          prop="categoryId"
-        >
-          <el-select style="width:93%" v-model="lookHeaderAndResponseForm.assertCategoryId" placeholder="请选择获取Token方式" prop="getTokenWay">
-            <el-option
-              v-for="item in tokenAssertWay"
-              :key="item.id"
-              :label="item.name"
-              :value="item.id"
-            ></el-option>
-          </el-select>
-        </el-form-item>
-
-
-      </el-form>
-      <!-- 添加组件第二部底部区域 -->
-      <span slot="footer" class="dialog-footer">
-        <el-button @click="backFitst()">上一步</el-button>
-        <el-button type="primary" @click="addComponent()">提交</el-button>
-      </span>
-    </el-dialog>
-    <!-- 修改用例弹窗 -->
-    <el-dialog title="用例编辑" :visible.sync="editDialogVisible" width="50%" @close="closeEdit()">
-      <span></span>
-      <!-- 修改用例表单 -->
-
-            <el-form ref="editCaseFormRef" :rules="editFormRules" :model="editCaseForm" label-width="100px">
-        <el-form-item
-          style="margin-left:150px;margin-right:150px"
-          class="input-center"
-          label="用例名称"
-          prop="name"
-        >
-          <el-input
-            prefix-icon="el-icon-edit"
-            v-model="editCaseForm.name"
-            placeholder="请输入用例名"
-            style="width:93%"
-          ></el-input>
-        </el-form-item>
-
-        <el-form-item
-          style="margin-left:150px;margin-right:150px"
-          class="input-center"
-          label="协议类型"
-          prop="protocolId"
-        >
-        <el-tooltip class="item" effect="dark" content="协议类型不可更改" placement="top">
-            <el-select disabled style="width:93%" v-model="editCaseForm.protocolId" placeholder="请选择协议">
-            
-            <el-option
-              v-for="item in protocolsOptions"
-              :key="item.value"
-              :label="item.label"
-              :value="item.value"
-            ></el-option>
-          </el-select>
-        </el-tooltip>
-        </el-form-item>
-
-        <el-form-item style="margin-left:150px;margin-right:150px" label="所属项目" prop="projectId">
-          <el-tooltip class="item" effect="dark" content="所属项目不可更改" placement="top">
-            <el-select disabled style="width:93%" v-model="editCaseForm.projectId" placeholder="请选择项目">
-            <el-option
-              v-for="item in projectOptions"
-              :key="item.value"
-              :label="item.label"
-              :value="item.value"
-            ></el-option>
-          </el-select>
-          </el-tooltip>
-        </el-form-item>
-
-
-        <el-form-item style="margin-left:150px;margin-right:150px" label="请求地址" prop="url">
-          <el-input 
-            prefix-icon="el-icon-discover"
-            v-model="editCaseForm.url"
-            placeholder="请输入请求地址"
-            style="width:93%"
-          ></el-input>
-        </el-form-item>
-        <!-- 请求头,暂时先不用 -->
-        <!-- <el-form-item style="margin-left:150px;margin-right:150px" label="请求头" prop="header">
-          <el-input 
-            prefix-icon="el-icon-stopwatch"
-            v-model="addCaseForm.header"
-            placeholder="请输入请求头"
-            style="width:93%"
-          ></el-input>
-        </el-form-item> -->
-
-
-        <el-form-item v-if="editCaseForm.protocolId != 1 && editCaseForm.protocolId != 4 " style="margin-left:150px;margin-right:150px" label="请求参数" prop="getParams">
-          <el-input type="textarea" :rows="5"
-            prefix-icon="el-icon-key"
-            v-model="editCaseForm.getParams"
-            placeholder="请输入请求参数"
-            style="width:93%"
-          >
-          </el-input>
-        </el-form-item>
-
-
-        <el-form-item style="margin-left:150px;margin-right:150px" label="断言标识" prop="assertFlag">
-          <el-input
-            prefix-icon="el-icon-price-tag"
-            v-model="editCaseForm.assertFlag"
-            placeholder="请输入断言标识，使用 “[index]”或者“.” 进行向下取值，例：data[0].param "
-            style="width:93%"
-          ></el-input>
-        </el-form-item>
-        <el-form-item style="margin-left:150px;margin-right:150px" label="预期断言" prop="assertContent">
-          <el-input
-            prefix-icon="el-icon-sort"
-            v-model="editCaseForm.assertContent"
-            placeholder="请输入预期的响应断言"
-            style="width:93%"
-          ></el-input>
-        </el-form-item>
-      </el-form>
-   
-      <!-- 修改底部区域 -->
-      <span slot="footer" class="dialog-footer">
-        <el-button @click="editDialogVisible = false">取 消</el-button>
-        <el-button type="primary" @click="editCase()">确 定</el-button>
-      </span>
-    </el-dialog>
+    
   </div>
 </template>
 <script>
@@ -736,6 +600,15 @@ export default {
     }
   },
   created() {
+    if (
+      window.sessionStorage.getItem("projectId") != null &&
+      window.sessionStorage.getItem("projectName") != null
+    ) {
+      this.$global.currentProjectId = window.sessionStorage.getItem("projectId");
+      this.$global.currentProjectName = window.sessionStorage.getItem("projectName");
+      this.addDataSourceForm.projectId = this.$global.currentProjectId;
+      this.queryDataSourceListParams.projectId = this.$global.currentProjectId;
+    }
     this.getProject();
     this.getDataSourceList();
   }

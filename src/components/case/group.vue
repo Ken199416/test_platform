@@ -1,19 +1,38 @@
 <template>
-  <div v-loading="loading" 
-  element-loading-text="正在努力调用接口...">
+  <div v-loading="loading" element-loading-text="正在努力调用接口...">
     <!-- 面包屑区域 -->
     <el-breadcrumb>
       <el-breadcrumb-item :to="{ path: '/' }">首页</el-breadcrumb-item>
       <el-breadcrumb-item>用例管理</el-breadcrumb-item>
       <el-breadcrumb-item>接口用例集</el-breadcrumb-item>
     </el-breadcrumb>
+
     <!-- 卡片区域 -->
     <el-card>
       <!-- 搜索or添加 -->
       <el-row :gutter="10">
         <!-- 选择项目 -->
-        <el-col :span="3">
-          <el-select clearable v-model="queryCaseListParams.projectId" placeholder="请选择项目">
+        <el-col
+          :span="3"
+          v-if="this.$global.currentProjectId == null && this.$global.currentProjectName == null"
+        >
+          <el-select clearable v-model="queryCaseGroupListParams.projectId" placeholder="请选择项目">
+            <el-option
+              v-for="item in projectOptions"
+              :key="item.id"
+              :label="item.name"
+              :value="item.id"
+            ></el-option>
+          </el-select>
+        </el-col>
+
+        <el-col :span="3" v-else>
+          <el-select
+            disabled
+            clearable
+            v-model="this.$global.currentProjectName"
+            placeholder="请选择项目"
+          >
             <el-option
               v-for="item in projectOptions"
               :key="item.id"
@@ -27,52 +46,78 @@
           <el-input
             @keyup.enter.native="getCaseList()"
             placeholder="请输入Case用例集名称"
-            v-model="queryCaseListParams.query"
+            v-model="queryCaseGroupListParams.query"
             clearable
-            @clear="getCaseList()"
-          >
-            <!-- <el-button slot="append" icon="el-icon-search" @click="getCaseListBySelect()"></el-button> -->
-          </el-input>     
+            @clear="getAllCaseGroup()"
+          ></el-input>
         </el-col>
-                  <el-col :span="2">
-            <el-button icon="el-icon-search" @click="getCaseListBySelect()"></el-button>
-          </el-col>
+        <el-col :span="2">
+          <el-button icon="el-icon-search" @click="getCaseGroupListBySelect()"></el-button>
+        </el-col>
         <el-col :span="15" style="text-align:right">
-          <!-- <el-button type="primary">添加</el-button> -->
           <el-button type="primary" @click="addCaseGroupDialog = true">添加Case集</el-button>
         </el-col>
       </el-row>
 
       <!-- 列表区域 -->
-      <el-table :data="caseGroupList" border height="670" style="width: 100%">
-                <el-table-column fixed type="index" label="#" width="50px"></el-table-column>
-        <el-table-column prop="name" label="用例集名称" width="200"></el-table-column>
-        <el-table-column prop="projectId" label="所属项目" width="200">
+      <el-table  :data="caseGroupList" border height="670" style="width: 100%">
+        <el-table-column type="expand" @click="openDebug()">
+          <template slot-scope="scope" @click="openDebug()">
+            <el-steps :active="active" process-status="process" :finish-status="success" align-center>
+                <el-step :title="item.name" :description="item.desc" :key="index" v-for="(item,index) in scope.row.caseList "></el-step>
+            </el-steps>
+            <el-button v-if="active == 0" style="margin-top: 12px;" @click="next(scope.row)">开 始</el-button>
+            <el-button v-else-if="active == scope.row.caseTotal" style="margin-top: 12px;" @click="next(scope.row)">重新执行</el-button>
+            <el-button v-else style="margin-top: 12px;" @click="next(scope.row)">下一步</el-button> 
+            <el-button  style="margin-top: 12px;" @click="resetActive">重 置</el-button>
+          </template>
+
+
+        </el-table-column>
+        <el-table-column prop="name" label="用例集名称" width="200" >
+            <template slot-scope="scope">
+            <el-popover placement="right" width="400px" trigger="hover" width:300px>
+              <el-table :data="scope.row.caseList" border >
+                <el-table-column width="70" property="pri" label="优先级"></el-table-column>
+                <el-table-column width="200" property="name" label="用例名"></el-table-column>
+                <el-table-column width="350" property="desc" label="描述"></el-table-column>
+              </el-table>
+
+              <div slot="reference" style="cursor:pointer"
+               >{{scope.row.name}}</div>
+            </el-popover>
+          </template>
+
+
+
+        </el-table-column>
+        <el-table-column prop="projectId" label="所属项目" width="130">
           <template slot-scope="scope">
-            <el-tag v-if="scope.row.projectId==1" type="warning">订单项目</el-tag>
-            <el-tag v-if="scope.row.projectId==2" type="warning">商品项目</el-tag>
+            <el-tag type="warning">{{scope.row.projectName}}</el-tag>
           </template>
         </el-table-column>
-        <!-- <el-table-column prop="protocolId" label="请求方式" width="150">
+        <el-table-column prop="" label="动态参数" width="500">
           <template slot-scope="scope">
-            <el-tag v-if="scope.row.protocolId==1" type="success">GET</el-tag>
-            <el-tag v-if="scope.row.protocolId==2" type="danger">POST</el-tag>
+              <el-row type="flex" justify="start">
+                <el-col style="margin-top:5px;text-align: center;" 
+                :key="index" v-for="(item,index) in scope.row.reference" 
+                :span="6"><div class="grid-content bg-purple-dark">
+                <el-tooltip :content="item.referenceDesc" placement="top"> 
+                  <el-button type="primary" plain size="mini">{{item.referenceName}}</el-button>
+                </el-tooltip>
+                  </div></el-col>
+              </el-row>
           </template>
-        </el-table-column> -->
-        <el-table-column prop="v" label="相关组件" width="200"></el-table-column>
-        <el-table-column prop="a" label="请求参数" width="500"></el-table-column>
-        <!-- 请求头暂时不用 -->
-        <!-- <el-table-column prop="header" label="请求头" width="500"></el-table-column> -->
-        <!-- <el-table-column prop="assertFlag" label="断言标志" width="300"></el-table-column>
-        <el-table-column prop="assertContent" label="断言内容" width="200"></el-table-column> -->
-        <!-- 状态按钮 -->
+        </el-table-column>
+      
+        <el-table-column prop="caseGroupDescribe" label="用例集描述" width="200"></el-table-column>
         <el-table-column label="状态" width="70">
           <template slot-scope="scope">
             <el-tooltip
               v-if="scope.row.del"
               class="item"
               effect="dark"
-              content="停用该用例"
+              content="停用该用例集"
               placement="top"
               :enterable="false"
             >
@@ -82,7 +127,7 @@
               v-else
               class="item"
               effect="dark"
-              content="继续使用该用例"
+              content="继续使用该用例集"
               placement="top"
               :enterable="false"
             >
@@ -91,21 +136,20 @@
           </template>
         </el-table-column>
         <!-- 操作列 -->
-        <el-table-column  label="操作">
+        <el-table-column label="操作">
           <template slot-scope="scope">
             <el-button
               type="primary"
               icon="el-icon-edit-outline"
-              @click="showDialogVisible(scope.row)"
+              @click="openAddCaseDialog(scope.row)"
               size="mini"
             >分配用例</el-button>
             <el-button
               type="primary"
               icon="el-icon-edit-outline"
               size="mini"
-              @click="runCaseById(scope.row.id)"
-            >分配组件</el-button>
-
+              @click="openEditCaseDialog(scope.row)"
+            >调整用例</el-button>
 
             <el-tooltip
               class="item"
@@ -115,11 +159,12 @@
               :enterable="false"
             >
               <el-button
-              size="mini"
-              type="primary" plain
-              icon="el-icon-video-play"
-              @click="getExecuteRecoding(scope.row.id)"
-            ></el-button>
+                size="mini"
+                type="primary"
+                plain
+                icon="el-icon-video-play"
+                @click="runCaseGroup(scope.row)"
+              ></el-button>
             </el-tooltip>
 
             <el-tooltip
@@ -130,14 +175,13 @@
               :enterable="false"
             >
               <el-button
-              size="mini"
-              type="success" plain
-              icon="el-icon-view"
-              @click="getExecuteRecoding(scope.row.id)"
-            ></el-button>
+                size="mini"
+                type="success"
+                plain
+                icon="el-icon-view"
+                @click="getExecuteRecoding(scope.row.id)"
+              ></el-button>
             </el-tooltip>
-            
-
           </template>
         </el-table-column>
       </el-table>
@@ -146,34 +190,105 @@
       <el-pagination
         @size-change="handleSizeChange"
         @current-change="handleCurrentChange"
-        :current-page="queryCaseListParams.pageNum"
+        :current-page="queryCaseGroupListParams.pageNum"
         :page-sizes="[10, 15, 20, 50]"
-        :page-size="queryCaseListParams.pageSize"
+        :page-size="queryCaseGroupListParams.pageSize"
         layout="total, sizes, prev, pager, next, jumper"
         :total="caseGroupTotal"
       ></el-pagination>
     </el-card>
 
-    <!-- 添加用例的对话框 -->
-    <el-dialog :close-on-click-modal="false"  title="用例集添加" :visible.sync="addCaseGroupDialog" width="50%" @close="closeAdd()">
+
+<el-dialog
+  title="执行结果" :close-on-click-modal="false"
+  :visible.sync="executeCaseByIndexResponse"
+  width="80%"
+  >
+  <el-form  label-width="80px" :model="caseResult">
+  <el-form-item label="响应结果">
+    <el-input contenteditable="true" type="textarea"  v-model="caseResult.responseStr"></el-input>
+  </el-form-item>
+  <el-form-item label="断言结果">
+    <el-table
+      :data="caseResult.assertDomains"
+      style="width: 100%">
+      <el-table-column
+        prop="nameValue"
+        label="断言表达式"
+        width="300">
+      </el-table-column>
+      <el-table-column
+        prop="paramValue"
+        label="断言内容"
+        width="300">
+      </el-table-column>
+            <el-table-column
+        prop="paramDesc"
+        label="断言结果">
+      </el-table-column>
+    </el-table>
+  </el-form-item>
+  <el-form-item label="参数截取">
+    <el-table
+      :data="caseResult.paramsDomains"
+      style="width: 100%">
+      <el-table-column
+        prop="nameValue"
+        label="参数引用名"
+        width="300">
+      </el-table-column>
+      <el-table-column
+        prop="paramValue"
+        label="参数描述"
+        width="300">
+        </el-table-column>
+    </el-table>
+  </el-form-item>
+</el-form>
+
+  <span slot="footer" class="dialog-footer">
+    <el-button type="primary" @click="executeCaseByIndexResponse = false">我知道了</el-button>
+  </span>
+</el-dialog>
+
+
+
+    <!-- 添加用例集的对话框 -->
+    <el-dialog
+      :close-on-click-modal="false"
+      title="用例集添加"
+      :visible.sync="addCaseGroupDialog"
+      width="50%"
+      @close="closeAdd()"
+    >
       <span></span>
-      <!-- 添加用例表单 -->
-      <el-form ref="addCaseGroupFormRef" :rules="addCaseGroupFormRules" :model="addCaseGroupForm" label-width="100px">
+      <!-- 添加用例集表单 -->
+      <el-form
+        ref="addCaseGroupFormRef"
+        :rules="addCaseGroupFormRules"
+        :model="addCaseGroupForm"
+        label-width="100px"
+      >
         <el-form-item
           style="margin-left:150px;margin-right:150px"
           class="input-center"
-          label="用例组名称"
+          label="用例集名称"
           prop="name"
         >
           <el-input
             prefix-icon="el-icon-edit"
             v-model="addCaseGroupForm.name"
-            placeholder="请输入用例名"
+            placeholder="请输入用例集名"
             style="width:93%"
           ></el-input>
         </el-form-item>
 
-        <el-form-item style="margin-left:150px;margin-right:150px" label="所属项目" prop="projectId">
+        <el-form-item
+          v-if="this.$global.currentProjectId == null && this.$global.currentProjectName == null"
+          style="margin-left:150px;margin-right:150px"
+          label="所属项目"
+          prop="projectId"
+        >
           <el-select style="width:93%" v-model="addCaseGroupForm.projectId" placeholder="请选择所属项目">
             <el-option
               v-for="item in projectOptions"
@@ -182,6 +297,41 @@
               :value="item.id"
             ></el-option>
           </el-select>
+        </el-form-item>
+
+        <el-form-item
+          v-else
+          style="margin-left:150px;margin-right:150px"
+          label="所属项目"
+          prop="projectId"
+        >
+          <el-select
+            disabled
+            style="width:93%"
+            v-model="this.$global.currentProjectName"
+            placeholder="请选择所属项目"
+          >
+            <el-option
+              v-for="item in projectOptions"
+              :key="item.id"
+              :label="item.name"
+              :value="item.id"
+            ></el-option>
+          </el-select>
+        </el-form-item>
+
+        <el-form-item
+          style="margin-left:150px;margin-right:150px"
+          class="input-center"
+          label="用例集描述"
+          prop="caseGroupDescribe"
+        >
+          <el-input
+            prefix-icon="el-icon-edit"
+            v-model="addCaseGroupForm.caseGroupDescribe"
+            placeholder="请输入用例集描述"
+            style="width:93%"
+          ></el-input>
         </el-form-item>
       </el-form>
       <!-- 添加底部区域 -->
@@ -192,104 +342,99 @@
     </el-dialog>
 
     <!-- 分配用例弹窗 -->
-    <el-dialog :close-on-click-modal="false"  title="为组件分配用例" :visible.sync="editDialogVisible" width="90%" @close="closeEdit()">
+    <el-dialog
+      :close-on-click-modal="false"
+      title="为组件分配用例"
+      :visible.sync="addCaseDialog"
+      width="60%"
+      @close="closeAddCase()"
+    >
       <!-- 分配用例表单 -->
 
-        <el-form ref="editCaseFormRef" :rules="editFormRules" :model="editCaseForm" label-width="100px">
-        <el-form-item
-          style="margin-left:150px;margin-right:150px"
-          class="input-center"
-          label="用例名称"
-          prop="name"
-        >
-          <el-input
-            prefix-icon="el-icon-edit"
-            v-model="editCaseForm.name"
-            placeholder="请输入用例名"
-            style="width:93%"
-          ></el-input>
-        </el-form-item>
-
-        <el-form-item
-          style="margin-left:150px;margin-right:150px"
-          class="input-center"
-          label="协议类型"
-          prop="protocolId"
-        >
-        <el-tooltip class="item" effect="dark" content="协议类型不可更改" placement="top">
-            <el-select disabled style="width:93%" v-model="editCaseForm.protocolId" placeholder="请选择协议">
-            
-            <el-option
-              v-for="item in protocolsOptions"
-              :key="item.id"
-              :label="item.name"
-              :value="item.id"
-            ></el-option>
-          </el-select>
-        </el-tooltip>
-        </el-form-item>
-
-        <el-form-item style="margin-left:150px;margin-right:150px" label="所属项目" prop="projectId">
-          <el-tooltip class="item" effect="dark" content="所属项目不可更改" placement="top">
-            <el-select disabled style="width:93%" v-model="editCaseForm.projectId" placeholder="请选择项目">
-            <el-option
-              v-for="item in projectOptions"
-              :key="item.id"
-              :label="item.name"
-              :value="item.id"
-            ></el-option>
-          </el-select>
-          </el-tooltip>
-        </el-form-item>
-
-
-        <el-form-item style="margin-left:150px;margin-right:150px" label="请求地址" prop="url">
-          <el-input 
-            prefix-icon="el-icon-discover"
-            v-model="editCaseForm.url"
-            placeholder="请输入请求地址"
-            style="width:93%"
-          ></el-input>
-        </el-form-item>
-
-        <el-form-item v-if="editCaseForm.protocolId != 1 && editCaseForm.protocolId != 4 " style="margin-left:150px;margin-right:150px" label="请求参数" prop="getParams">
-          <el-input type="textarea" :rows="5"
-            prefix-icon="el-icon-key"
-            v-model="editCaseForm.getParams"
-            placeholder="请输入请求参数"
-            style="width:93%"
-          >
-          </el-input>
-        </el-form-item>
-
-
-        <el-form-item style="margin-left:150px;margin-right:150px" label="断言标识" prop="assertFlag">
-          <el-input
-            prefix-icon="el-icon-price-tag"
-            v-model="editCaseForm.assertFlag"
-            placeholder="请输入断言标识，使用 “[index]”或者“.” 进行向下取值，例：data[0].param "
-            style="width:93%"
-          ></el-input>
-        </el-form-item>
-        <el-form-item style="margin-left:150px;margin-right:150px" label="预期断言" prop="assertContent">
-          <el-input
-            prefix-icon="el-icon-sort"
-            v-model="editCaseForm.assertContent"
-            placeholder="请输入预期的响应断言"
-            style="width:93%"
-          ></el-input>
-        </el-form-item>
+      <el-form
+        ref="addCaseFormRef"
+        :rules="addCaseFormRules"
+        :model="addCaseForm"
+        label-width="100px"
+      >
+        <el-row>
+          <el-col :span="16">
+            <div class="grid-content bg-purple">
+              <el-form-item style="margin-left:50px;" label="执行用例" prop="caseId">
+                <el-select
+                  filterable
+                  remote
+                  :remote-method="getCaseList"
+                  style="width:80%"
+                  v-model="addCaseForm.caseId"
+                  placeholder="输入用例名进行模糊匹配"
+                >
+                  <el-option
+                    v-for="item in caseList"
+                    :key="item.id"
+                    :label="item.name"
+                    :value="item.id"
+                  ></el-option>
+                </el-select>
+              </el-form-item>
+            </div>
+          </el-col>
+          <el-col :span="8">
+            <div class="grid-content bg-purple">
+              <el-form-item style="margin-right:0px" label="执行优先级" prop="pri">
+                <el-input
+                  prefix-icon="el-icon-sort"
+                  v-model.number="addCaseForm.pri"
+                  placeholder="数值类型"
+                  style="width:60%"
+                ></el-input>
+              </el-form-item>
+            </div>
+          </el-col>
+        </el-row>
       </el-form>
-   
-      <!-- 修改底部区域 -->
+
+      <!-- 分配用例底部区域 -->
       <span slot="footer" class="dialog-footer">
-        <el-button @click="editDialogVisible = false">取 消</el-button>
-        <el-button type="primary" @click="editCase()">确 定</el-button>
+        <el-button @click="addCaseDialog = false">取 消</el-button>
+        <el-button type="primary" @click="addCase()">确 定</el-button>
       </span>
+    </el-dialog>
+
+    <!-- 调整用例弹窗 -->
+    <el-dialog
+      :close-on-click-modal="false"
+      title="调整组件"
+      :visible.sync="editCaseDialog"
+      width="40%"
+      @close="closeEdit()"
+    >
+      <!-- 调整列表用例表单 -->
+      <div style="text-align: center;">
+        <el-table :data="groupCaseList" style="width: 100%;">
+          <el-table-column prop="name" label="用例名称" width="250"></el-table-column>
+          <el-table-column prop="pri" label="用例优先级" width="250">
+            <template slot-scope="scope">
+              <el-input v-model.number="scope.row.pri" @blur="changePri(scope.row)"></el-input>
+            </template>
+          </el-table-column>
+          <el-table-column prop="pri" label="操作" width="200">
+            <template slot-scope="scope">
+              <el-button
+                type="danger"
+                @click="delGroupCase(scope.row)"
+                icon="el-icon-delete"
+                circle
+              ></el-button>
+            </template>
+          </el-table-column>
+        </el-table>
+      </div>
     </el-dialog>
   </div>
 </template>
 <script>
+import Sortable from "sortablejs";
 export default {
   data() {
     //   验证邮箱
@@ -301,16 +446,15 @@ export default {
       }
       callback(new Error("请输入合法的邮箱"));
     };
-    //    验证手机号
-    var checkMobile = (rule, value, callback) => {
-      // 验证手机号的正则
-      const regMobile = /^1([38][0-9]|4[579]|5[0-3,5-9]|6[6]|7[0135678]|9[89])\d{8}$/;
-      if (regMobile.test(value)) {
+    //    验证数值
+    var checkNumber = (rule, value, callback) => {
+      // 验证数值的正则
+      const number = /^[0-9]*$/;
+      if (number.test(value)) {
         return callback();
       }
-      callback(new Error("请输入正确的手机号"));
+      callback(new Error("请输入正整数"));
     };
-
 
     var checkJson = (rule, value, callback) => {
       if (this.isJSON(value)) {
@@ -319,20 +463,31 @@ export default {
       callback(new Error("JSON格式有误，请检查"));
     };
     return {
-      loading:false,
-      textareaHigh:5,
+      drawer: false,
+      currentGroupId: "",
+      addCaseDialog: false,
+      editCaseDialog: false,
+      loading: false,
+      textareaHigh: 5,
       protocolsOptions: [],
       projectOptions: [],
       // 获取用户列表
       queryCaseListParams: {
         query: "",
         pageNum: 1,
-        pageSize: 10,
+        pageSize: 100,
         protocolId: "",
         projectId: ""
       },
-      delCaseParam: {
-        cid: 0,
+      queryCaseGroupListParams: {
+        query: "",
+        pageNum: 1,
+        pageSize: 10,
+        projectId: ""
+      },
+      caseList: [],
+      delCaseGroupParam: {
+        groupId: 0,
         flag: true
       },
       caseGroupList: [],
@@ -342,22 +497,17 @@ export default {
       //   添加用户表单规则
       addCaseGroupForm: {
         name: "",
-        projectId:""
+        projectId: "",
+        caseGroupDescribe: ""
       },
-      componentList:[],
+      componentList: [],
       //   修改用户信息
-      editCaseForm: {
-        // id: 0,
-        // name: "",
-        // protocolId: 2,
-        // projectId: 1,
-        // getParams: "",
-        // postParams: "",
-        // header: "",
-        // assertFlag: "",
-        // assertContent: "",
-        // url:''checkJson
+      addCaseForm: {
+        caseId: "",
+        groupId: "",
+        pri: ""
       },
+      editCaseForm: {},
       //   添加表单验证规则的对象
       addCaseGroupFormRules: {
         name: [
@@ -367,67 +517,165 @@ export default {
         projectId: [
           { required: true, message: "请选择用例组所属项目", trigger: "blur" }
         ]
-       
-
       },
-      editFormRules: {
-        name: [
-          { required: true, message: "请输入您的用例名称", trigger: "blur" },
-          { min: 2, max: 20, message: "长度在 2 到 20 个字符", trigger: "blur" }
+      addCaseFormRules: {
+        caseId: [
+          { required: true, message: "请选择要添加的用例", trigger: "blur" }
         ],
-        protocolId: [
-          { required: true, message: "请选择协议类型", trigger: "blur" }
-        ],
-        projectId: [
-          { required: true, message: "请选择所属项目", trigger: "blur" },
-        ],
-        assertFlag: [
-          { required: true, message: "请输入断言标志", trigger: "blur" }
-        ],
-        assertContent: [
-           { required: true, message: "请输入断言内容", trigger: "blur" }
+        pri: [
+          { required: true, message: "请输入执行优先级", trigger: "blur" },
+          { validator: checkNumber, trigger: "blur" }
         ]
-        ,url:[
-           { required: true, message: "请输入请求URL", trigger: "blur" }
-        ],
-        getParams: [
-          {validator : checkJson ,  trigger: "blur"}
-        ]
-
       },
-      editDialogVisible: false
+      editCaseFormRules: {},
+      editCaseDialog: false,
+      groupCaseList: [],
+      changePriParams: {},
+      delGroupCaseParams: {},
+      caseList: [],
+      active:0,
+      executeCaseByIndexResponse:false,
+      caseResult:{},
+      success:"success"
+
     };
   },
   methods: {
-    addCaseOpenDialog(){
+    openDebug(){
+      console.log("打开");
+    },
+    resetActive(){
+      this.active = 0;
+    },
+    async next(row) {
+      console.log(row);
+        if (this.active++ > row.caseTotal - 1) {
+          this.active = 0;
+        }else{
+          this.loading = true;
+          const response = await this.$common.get('/runCaseByIndex?index=' + this.active + "&groupId=" + row.id);
+          if(response.data.success){
+            this.success = 'success';
+          }else{
+            this.success = 'error';
+          }
+          this.caseResult = response.params;
+          this.loading = false;
+          this.executeCaseByIndexResponse = true;
+
+        } 
+      },
+    async getCaseListByCaseGroupId(event,id) {
+      // 剪头回来继续写，先展示一个dialog，然后展示信息，可以选择利用嵌套信息
+      // console.log(id);
+      const response = await this.$common.get(
+        "/getGroupCaseList?groupId=" + id
+      );
+      this.caseList = response.data;
+    },
+    async runCaseGroup(row) {
+      this.loading = true;
+      const response = await this.$common.get("/runGroupCaseById?id=" + row.id);
+      if (response.code == 10000) {
+        this.$message.success(response.msg);
+        this.loading = false;
+      } else {
+        this.$message.error(response.msg);
+        this.loading = false;
+      }
+      this.loading = false;
+    },
+    async delGroupCase(row) {
+      this.delGroupCaseParams.id = row.crgId;
+      this.delGroupCaseParams.groupId = this.currentGroupId;
+      const response = await this.$common.get(
+        "/delGroupCase",
+        this.delGroupCaseParams
+      );
+      this.groupCaseList = response.data;
+    },
+    async changePri(row) {
+      this.changePriParams.id = row.crgId;
+      this.changePriParams.pri = row.pri;
+      this.changePriParams.groupId = this.currentGroupId;
+      const response = await this.$common.get(
+        "/updateGroupCase",
+        this.changePriParams
+      );
+      this.groupCaseList = response.data;
+    },
+    closeEdit() {
+      // 关闭弹窗时，清空用例集中的用例列表
+    },
+    async openEditCaseDialog(row) {
+      this.currentGroupId = row.id;
+      this.editCaseDialog = true;
+      const response = await this.$common.get(
+        "/getGroupCaseList?groupId=" + row.id
+      );
+      // console.log(response.data);
+      this.groupCaseList = response.data;
+    },
+    async addCase() {
+      this.$refs.addCaseFormRef.validate(async valid => {
+        if (valid) {
+          const response = await this.$common.post(
+            "/caseGroupAddCase",
+            this.addCaseForm
+          );
+          this.$message.success(response.msg);
+          if (response.code == 10000) {
+            this.addCaseDialog = false;
+          } else {
+          }
+        }
+      });
+    },
+    async getCaseList(query) {
+      if (query !== "") {
+        this.queryCaseListParams.query = query;
+        const response = await this.$common.get(
+          "/getAllCase",
+          this.queryCaseListParams
+        );
+        this.caseList = response.data;
+      }
+    },
+
+    openAddCaseDialog(row) {
+      this.addCaseForm.groupId = row.id;
+      // 打开弹出时，设置项目ID，
+      this.queryCaseListParams.projectId = row.projectId;
+      this.addCaseDialog = true;
+    },
+    addCaseOpenDialog() {
       this.getAllComponent();
       this.addDialogVisible = true;
     },
-    getCaseListBySelect(){
-      this.queryCaseListParams.pageNum = 1;
-      this.queryCaseListParams.pageSize = 10;
-      this.getCaseList();
+    getCaseGroupListBySelect() {
+      this.queryCaseGroupListParams.pageNum = 1;
+      this.queryCaseGroupListParams.pageSize = 10;
+      this.getAllCaseGroup();
     },
     isJSON(str) {
-    if (typeof str == 'string') {
+      if (typeof str == "string") {
         try {
-            var obj=JSON.parse(str);
-            if(typeof obj == 'object' && obj ){
-                return true;
-            }else{
-                return false;
-            }
-
-        } catch(e) {
-            console.log('error：'+str+'!!!'+e);
+          var obj = JSON.parse(str);
+          if (typeof obj == "object" && obj) {
+            return true;
+          } else {
             return false;
+          }
+        } catch (e) {
+          console.log("error：" + str + "!!!" + e);
+          return false;
         }
-      return true;
+        return true;
       }
     },
     async getAllCaseGroup() {
       const { data: response } = await this.$http.get("/getAllCaseGroup", {
-        params: this.queryCaseListParams
+        params: this.queryCaseGroupListParams
       });
       if (response.code != 10000) {
         this.$message.error(response.msg);
@@ -437,34 +685,33 @@ export default {
       }
     },
     async delCase(row) {
-      this.delCaseParam.cid = row.id;
-      this.delCaseParam.flag = row.del;
-      const { data: response } = await this.$http.get("/toDelCase", {
-        params: this.delCaseParam
+      this.delCaseGroupParam.groupId = row.id;
+      this.delCaseGroupParam.flag = row.del;
+      const { data: response } = await this.$http.get("/delGroup", {
+        params: this.delCaseGroupParam
       });
       if (response.code != 10000) {
         this.$message.error("服务器开小差了，请稍后重试或者联系管理员！");
-      }
-      if (!row.del) {
-        this.$message({
-          type: "success",
-          message: "该用例已停用!"
-        });
       } else {
-        this.$message({
-          type: "success",
-          message: "该用例已恢复使用!"
-        });
+        if (!row.del) {
+          this.$message({
+            type: "success",
+            message: "该用例已停用!"
+          });
+        } else {
+          this.$message({
+            type: "success",
+            message: "该用例已恢复使用!"
+          });
+        }
       }
-      this.getCaseList();
+      this.getAllCaseGroup();
     },
-    // handleClick(row) {
-    //   console.log(row);
-    // },
     async changeDel(row) {
+      console.log(row);
       // 停用
       if (!row.del) {
-        await this.$confirm("是否停用该用例?", "提示", {
+        await this.$confirm("是否停用该用例集?", "提示", {
           confirmButtonText: "停用",
           cancelButtonText: "取消",
           type: "warning"
@@ -473,14 +720,14 @@ export default {
             this.delCase(row);
           })
           .catch(() => {
-            this.getCaseList();
+            this.getAllCaseGroup();
             this.$message({
               type: "info",
               message: "已取消停用"
             });
           });
       } else {
-        await this.$confirm("是否恢复使用该用例?", "提示", {
+        await this.$confirm("是否恢复使用该用例集?", "提示", {
           confirmButtonText: "恢复",
           cancelButtonText: "取消",
           type: "warning"
@@ -490,7 +737,7 @@ export default {
             // console.log("删除了");
           })
           .catch(() => {
-            this.getCaseList();
+            this.getAllCaseGroup();
             this.$message({
               type: "info",
               message: "已取消恢复使用"
@@ -500,21 +747,15 @@ export default {
     },
     // 监听每页显示数的改变
     handleSizeChange(newSize) {
-      this.queryCaseListParams.pageSize = newSize;
+      this.queryCaseGroupListParams.pageSize = newSize;
       this.getCaseList();
       // console.log(newSize);
     },
     // 监听页码的改变
     handleCurrentChange(newPage) {
-      this.queryCaseListParams.pageNum = newPage;
+      this.queryCaseGroupListParams.pageNum = newPage;
       this.getCaseList();
       // console.log(newPage);
-    },
-    // 监听添加用户框关闭后的清除操作
-    closeAdd() {
-      this.$refs.addCaseGroupFormRef.resetFields();
-      this.textareaHigh = 4;
-
     },
     // 发送添加用例组的请求
     async addCaseGroup() {
@@ -526,10 +767,10 @@ export default {
           );
           if (response.code == 10000) {
             this.$message.success(response.msg);
-            this.addCaseGroupDialog = false;      
+            this.addCaseGroupDialog = false;
           } else {
             this.$message.error(response.msg);
-            this.addCaseGroupDialog = true; 
+            this.addCaseGroupDialog = true;
           }
         } else {
         }
@@ -539,10 +780,12 @@ export default {
     async showDialogVisible(caseInfo) {
       // console.log(user);
       this.editDialogVisible = true;
-      const {data : response} = await this.$http.get("/getCaseById?id=" + caseInfo.id);
-      if(response.code == 10000){
+      const { data: response } = await this.$http.get(
+        "/getCaseById?id=" + caseInfo.id
+      );
+      if (response.code == 10000) {
         this.editCaseForm = response.data;
-      }else{
+      } else {
         this.$message.error(response.msg);
       }
     },
@@ -566,30 +809,54 @@ export default {
         }
       });
     },
-    closeEdit() {
-      this.$refs.editCaseFormRef.resetFields();
-      this.textareaHigh = 4;
+    closeAdd() {
+      this.$refs.addCaseGroupFormRef.resetFields();
+    },
+    closeAddCase() {
+      this.$refs.addCaseFormRef.resetFields();
     },
     async getProject() {
       const { data: response } = await this.$http.get("/getAllProject");
       this.projectOptions = response.data;
     },
-    async runCaseById (id){
-        this.loading = true;
-        const {data : response} = await this.$http.get("/runCaseById?id="+ id);
-        this.loading = false;
-        if(response.code == 10000){
-            this.$message.success(response.msg);
-        }else{
-            this.$message.error(response.msg);
-        }
+    async runCaseById(id) {
+      this.loading = true;
+      const { data: response } = await this.$http.get("/runCaseById?id=" + id);
+      this.loading = false;
+      if (response.code == 10000) {
+        this.$message.success(response.msg);
+      } else {
+        this.$message.error(response.msg);
+      }
     },
-    async getExecuteRecoding(cid){
-      this.$router.push("/case/executeRecoding/"+cid);
-
+    async getExecuteRecoding(cid) {
+      this.$router.push("/case/executeRecoding/" + cid);
+    },
+    changeProject(id, name) {
+      window.sessionStorage.setItem("projectId", id);
+      window.sessionStorage.setItem("projectName", name);
+      location.reload();
+    },
+    delProject() {
+      window.sessionStorage.removeItem("projectId");
+      window.sessionStorage.removeItem("projectName");
+      location.reload();
     }
   },
   created() {
+    if (
+      window.sessionStorage.getItem("projectId") != null &&
+      window.sessionStorage.getItem("projectName") != null
+    ) {
+      this.$global.currentProjectId = window.sessionStorage.getItem(
+        "projectId"
+      );
+      this.$global.currentProjectName = window.sessionStorage.getItem(
+        "projectName"
+      );
+      this.queryCaseGroupListParams.projectId = this.$global.currentProjectId;
+      this.addCaseGroupForm.projectId = this.$global.currentProjectId;
+    }
     this.getAllCaseGroup();
     this.getProject();
   }

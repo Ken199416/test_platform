@@ -19,9 +19,8 @@ import ConfigUser from './../components/config/user.vue'
 import ConfigPermission from './../components/config/permission.vue'
 import ConfigUserInfo from './../components/config/user/userInfo.vue'
 import ExecuteRecoding from './../components/case/executeRecoding.vue'
-import EditComponent from './../components/caseConfig/components/httpComponent.vue'
-
-
+import AddSQLSelectComponent from './../components/caseConfig/components/dbComponent.vue'
+import SingleCaseAction from './../components/case/caseAction/singleCaseAction.vue'
 
 
 Vue.use(VueRouter)
@@ -38,30 +37,80 @@ const routes = [
     path: '/home',component: Home,redirect :'/welcome',
       children:[
         {path:'/welcome',component:Welcome},
-        {path: '/case/single',component:CaseSingle},
-        {path: '/case/group',component:CaseGroup},
-        {path: '/case/database',component:CaseDatabase},
-        {path: '/case/executeRecoding/:cid',component:ExecuteRecoding,props: true},
+        {path: '/case/single',component:CaseSingle,
+        meta:{
+              keepAlive : true
+            }},
+        {path:'/case/single/action/:cid',component:SingleCaseAction,props:true,meta:{
+          keepAlive : false
+        }  
+        },
+        {path: '/case/group',component:CaseGroup,meta:{
+          keepAlive : true
+        }
+        },
+        {path: '/case/database',component:CaseDatabase,meta:{
+          keepAlive : true
+        }
+        },
+        {path: '/case/executeRecoding/:cid',component:ExecuteRecoding,props: true,meta:{
+          keepAlive : false
+        }},
 
-        {path: '/project/single',component:ProjectSingle},
-        {path: '/project/group',component:ProjectGroup},
+        {path: '/project/single',component:ProjectSingle,meta:{
+          keepAlive : true
+        }
+        },
+        {path: '/project/group',component:ProjectGroup,meta:{
+          keepAlive : true
+        }
+       },
 
-        {path: '/caseConfig/params',component:CaseConfigParams},
-        {path: '/caseConfig/component',component:CaseConfigComponent},
-        {path: '/caseConfig/dataSource',component:CaseConfigDateSource},
-        {path: '/case/editComponent/:cid',component:EditComponent,props:true},
+        {path: '/caseConfig/params',component:CaseConfigParams,meta:{
+          keepAlive : true
+        }
+        },
+        {path: '/caseConfig/component',component:CaseConfigComponent,meta:{
+          keepAlive : false
+        }},
+        {path: '/caseConfig/component/sqlSelectComponent',component:AddSQLSelectComponent,meta:{
+          keepAlive : false
+        }},
+        {path: '/caseConfig/dataSource',component:CaseConfigDateSource,meta:{
+          keepAlive : true
+        }
+      },
         
 
 
 
-        {path: '/task/job',component:TaskJob},
-        {path: '/task/report',component:TaskReport},
+        {path: '/task/job',component:TaskJob,meta:{
+          keepAlive : true
+        }
+    
+        },
+        {path: '/task/report',component:TaskReport,meta:{
+          keepAlive : true
+        }
+     },
 
-        {path: '/utils/first',component:UtilsFirst},
-        {path: '/utils/second',component:UtilsSecond},
+        {path: '/utils/first',component:UtilsFirst,meta:{
+          keepAlive : true
+        }
+      },
+        {path: '/utils/second',component:UtilsSecond,meta:{
+          keepAlive : true
+        }
+      },
 
-        {path: '/config/user',component:ConfigUser},
-        {path: '/config/permission',component:ConfigPermission},
+        {path: '/config/user',component:ConfigUser,meta:{
+          keepAlive : true
+        }
+       },
+        {path: '/config/permission',component:ConfigPermission,meta:{
+          keepAlive : true
+        }
+      },
         {path: '/config/user/userInfo/:uid',component:ConfigUserInfo,props: true}
         
 
