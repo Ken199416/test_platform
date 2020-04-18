@@ -1,14 +1,6 @@
 <template>
     <div>
-<el-table border
-      :data="tableData"
-      style="width: 100%">
-      <el-table-column v-for="item in list"
-        :prop="item.name"
-        :label="item.name"
-        width="180">
-      </el-table-column>
-</el-table>
+        没有工具，以后开发吧，着什么急
         </div>    
 </template>
 <script>

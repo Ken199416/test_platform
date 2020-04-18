@@ -1,13 +1,12 @@
 <template>
-  <div v-loading="loading" 
-  element-loading-text="正在努力调用接口...">
+  <div v-loading="loading" element-loading-text="正在努力调用接口...">
     <!-- 面包屑区域 -->
     <el-breadcrumb>
       <el-breadcrumb-item :to="{ path: '/' }">首页</el-breadcrumb-item>
       <el-breadcrumb-item>用例管理</el-breadcrumb-item>
       <el-breadcrumb-item>单接口用例</el-breadcrumb-item>
     </el-breadcrumb>
-    
+
     <!-- 卡片区域 -->
     <el-card>
       <!-- 搜索or添加 -->
@@ -35,11 +34,9 @@
           </el-select>
         </el-col>
 
-
-                <!-- 选择项目 -->
+        <!-- 选择项目 -->
         <el-col :span="3" v-else>
-          <el-select clearable disabled v-model="currentProjectName" placeholder="请选择项目">
-          </el-select>
+          <el-select clearable disabled v-model="currentProjectName" placeholder="请选择项目"></el-select>
         </el-col>
 
         <el-col :span="4">
@@ -49,12 +46,11 @@
             v-model="queryCaseListParams.query"
             clearable
             @clear="getCaseList()"
-          >
-          </el-input>     
+          ></el-input>
         </el-col>
-                  <el-col :span="2">
-            <el-button icon="el-icon-search" @click="getCaseListBySelect()"></el-button>
-          </el-col>
+        <el-col :span="2">
+          <el-button icon="el-icon-search" @click="getCaseListBySelect()"></el-button>
+        </el-col>
         <el-col :span="12" style="text-align:right">
           <!-- <el-button type="primary">添加</el-button> -->
           <el-button type="primary" @click="toAddCaseAction()">添加Case</el-button>
@@ -63,14 +59,26 @@
 
       <!-- 列表区域 -->
       <el-table :data="caseList" border height="650" style="width: 100%">
-                <el-table-column fixed type="index" label="#" width="50px"></el-table-column>
-        <el-table-column prop="name" label="用例名称" width="190"></el-table-column>
-        <el-table-column prop="projectName" label="所属项目" width="120">
+        <el-table-column fixed type="index" label="#" width="50px"></el-table-column>
+        <el-table-column prop="name" label="用例名称" width="190">
           <template slot-scope="scope">
-            <el-tag  type="warning">{{scope.row.projectName}}</el-tag>
+            <el-popover placement="right" width="400px" trigger="hover">
+              <el-card class="box-card">
+                <div>
+                  <span>用例描述：</span>
+                  <span>{{scope.row.desc != null ?scope.row.desc : "无" }}</span>
+                </div>
+              </el-card>
+              <div slot="reference" style="cursor:pointer">{{scope.row.name}}</div>
+            </el-popover>
           </template>
         </el-table-column>
-        <el-table-column prop="protocolId" label="请求方式" width="80">
+        <el-table-column prop="projectName" label="所属项目" width="150">
+          <template slot-scope="scope">
+            <el-tag type="warning">{{scope.row.projectName}}</el-tag>
+          </template>
+        </el-table-column>
+        <el-table-column prop="protocolId" label="请求方式" width="90">
           <template slot-scope="scope">
             <el-tag v-if="scope.row.protocolId==1" type="success">GET</el-tag>
             <el-tag v-if="scope.row.protocolId==2" type="danger">POST</el-tag>
@@ -78,8 +86,22 @@
         </el-table-column>
         <el-table-column prop="url" label="请求url" width="250"></el-table-column>
         <!-- <el-table-column prop="getParams" label="请求参数" width="300"></el-table-column> -->
-        <el-table-column prop="assertFlag" label="断言标志" width="180"></el-table-column>
-        <el-table-column prop="assertContent" label="断言内容" width="180"></el-table-column>
+        <el-table-column prop="assertFlag" label="断言标志" width="180">
+          <template slot-scope="scope">
+            <span :key="index" v-for="(item,index) in scope.row.assertFlag.split('<==>')">
+              {{item}}
+              <br />
+            </span>
+          </template>
+        </el-table-column>
+        <el-table-column prop="assertContent" label="断言内容" width="180">
+          <template slot-scope="scope">
+            <span :key="index" v-for="(item,index) in scope.row.assertContent.split('<==>')">
+              {{item}}
+              <br />
+            </span>
+          </template>
+        </el-table-column>
         <el-table-column prop="preCaseGroup" label="前置用例集" width="200"></el-table-column>
         <!-- 状态按钮 -->
         <el-table-column fixed="right" label="状态" width="70">
@@ -92,7 +114,11 @@
               placement="top"
               :enterable="false"
             >
-              <el-switch v-if="scope.row.del" v-model="scope.row.del" @change="changeDel(scope.row)"></el-switch>
+              <el-switch
+                v-if="scope.row.del"
+                v-model="scope.row.del"
+                @change="changeDel(scope.row)"
+              ></el-switch>
             </el-tooltip>
             <el-tooltip
               v-if="!scope.row.del"
@@ -102,7 +128,11 @@
               placement="top"
               :enterable="false"
             >
-              <el-switch v-if="!scope.row.del" v-model="scope.row.del" @change="changeDel(scope.row)"></el-switch>
+              <el-switch
+                v-if="!scope.row.del"
+                v-model="scope.row.del"
+                @change="changeDel(scope.row)"
+              ></el-switch>
             </el-tooltip>
           </template>
         </el-table-column>
@@ -110,18 +140,19 @@
         <el-table-column fixed="right" label="操作" width="240">
           <template slot-scope="scope">
             <el-button
+              v-if="scope.row.del"
               type="primary"
               icon="el-icon-edit-outline"
               @click="toEditCaseAction(scope.row)"
               size="mini"
             >编辑</el-button>
             <el-button
+              v-if="scope.row.del"
               type="primary"
               icon="el-icon-video-play"
               size="mini"
               @click="runCaseById(scope.row.id)"
             >执行</el-button>
-
 
             <el-tooltip
               class="item"
@@ -130,14 +161,8 @@
               placement="top"
               :enterable="false"
             >
-              <el-button
-              size="mini"
-              icon="el-icon-view"
-              @click="getExecuteRecoding(scope.row.id)"
-            ></el-button>
+              <el-button size="mini" icon="el-icon-view" @click="getExecuteRecoding(scope.row.id)"></el-button>
             </el-tooltip>
-            
-
           </template>
         </el-table-column>
       </el-table>
@@ -153,17 +178,75 @@
         :total="caseCount"
       ></el-pagination>
     </el-card>
+
+    <el-dialog
+  title="执行结果" :close-on-click-modal="false"
+  :visible.sync="executeResponseDialog"
+  width="80%"
+  >
+  <el-form  label-width="80px" :model="caseResult">
+  <el-form-item label="响应结果">
+    <el-input contenteditable="true" type="textarea"  v-model="caseResult.responseStr"></el-input>
+  </el-form-item>
+  <el-form-item label="断言结果">
+    <el-table
+      :data="caseResult.assertDomains"
+      style="width: 100%">
+      <el-table-column
+        prop="nameValue"
+        label="断言表达式"
+        width="300">
+      </el-table-column>
+      <el-table-column
+        prop="paramValue"
+        label="断言内容"
+        width="300">
+      </el-table-column>
+            <el-table-column
+        prop="paramDesc"
+        label="断言结果">
+      </el-table-column>
+    </el-table>
+  </el-form-item>
+  <el-form-item label="参数截取">
+    <el-table
+      :data="caseResult.paramsDomains"
+      style="width: 100%">
+      <el-table-column
+        prop="nameValue"
+        label="参数截取标志"
+        width="300">
+      </el-table-column>
+      <el-table-column
+        prop="paramValue"
+        label="参数引用名"
+        width="300">
+        </el-table-column>
+              <el-table-column
+        prop="paramDesc"
+        label="参数描述"
+        >
+        </el-table-column>
+    </el-table>
+  </el-form-item>
+</el-form>
+
+  <span slot="footer" class="dialog-footer">
+    <el-button type="primary" @click="executeResponseDialog = false">我知道了</el-button>
+  </span>
+</el-dialog>
+
   </div>
 </template>
 <script>
 export default {
   data() {
     return {
-      drawer:false,
+      drawer: false,
       // 调用接口加载的图层打开标志位
-      loading:false,
+      loading: false,
       // 文本域默认高度
-      textareaHigh:5,
+      textareaHigh: 5,
       // 协议类型列表
       protocolsOptions: [],
       // 项目列表
@@ -185,26 +268,28 @@ export default {
       caseList: [],
       // 用例总数
       caseCount: 0,
-      caseGroupList:{},
-      queryForm:{
-        query:"",
-        pageNum:1,
-        pageSize:50,
+      caseGroupList: {},
+      queryForm: {
+        query: "",
+        pageNum: 1,
+        pageSize: 50
       },
-      currentProjectId:'',
-      currentProjectName:''
+      currentProjectId: "",
+      currentProjectName: "",
+      executeResponseDialog:false,
+      caseResult:{}
     };
   },
   methods: {
-    toEditCaseAction(row){
-      this.$router.push('/case/single/action/'+row.id);
+    toEditCaseAction(row) {
+      this.$router.push("/case/single/action/" + row.id);
     },
-    toAddCaseAction(){
-    //  前往添加用例路由
-      this.$router.push('/case/single/action/add');
+    toAddCaseAction() {
+      //  前往添加用例路由
+      this.$router.push("/case/single/action/add");
     },
     // 获取全部用例，请求之前重置请求
-    getCaseListBySelect(){
+    getCaseListBySelect() {
       this.queryCaseListParams.pageNum = 1;
       // this.queryCaseListParams.pageSize = 10;
       this.getCaseList();
@@ -299,7 +384,6 @@ export default {
     closeAdd() {
       this.$refs.addCaseFormRef.resetFields();
       this.textareaHigh = 4;
-
     },
     // 获取协议列表
     async getProtocol() {
@@ -309,37 +393,43 @@ export default {
     // 获取项目列表
     async getProject() {
       this.$common.getAllProject().then(data => {
-      this.projectOptions = data;
-    })
+        this.projectOptions = data;
+      });
     },
-    async runCaseById (id){
-        this.loading = true;
-        const {data : response} = await this.$http.get("/runCaseById?id="+ id);
-        this.loading = false;
-        if(response.code == 10000){
-            this.$message.success(response.msg);
-        }else{
-            this.$message.error(response.msg);
-        }
+    // 运行用例
+    async runCaseById(id) {
+      this.loading = true;
+      const { data: response } = await this.$http.get("/runCaseById?id=" + id);
+      this.loading = false;
+      if (response.code == 10000) {
+        this.$message.success(response.msg);
+        this.caseResult = response.params;
+        this.executeResponseDialog = true;
+      } else {
+        this.$message.error(response.msg);
+        this.caseResult = response.params;
+        this.executeResponseDialog = true;
+      }
     },
-    async getExecuteRecoding(cid){
-      this.$router.push("/case/executeRecoding/"+cid);
-
+    async getExecuteRecoding(cid) {
+      this.$router.push("/case/executeRecoding/" + cid);
     },
-    changeProject(id,name){
-      window.sessionStorage.setItem("projectId",id);
-      window.sessionStorage.setItem("projectName",name);
+    changeProject(id, name) {
+      window.sessionStorage.setItem("projectId", id);
+      window.sessionStorage.setItem("projectName", name);
       location.reload();
     },
-    delProject(){
+    delProject() {
       window.sessionStorage.removeItem("projectId");
       window.sessionStorage.removeItem("projectName");
       location.reload();
     }
   },
   created() {
-    if(window.sessionStorage.getItem("projectId") != null){
-      this.queryCaseListParams.projectId = window.sessionStorage.getItem("projectId");
+    if (window.sessionStorage.getItem("projectId") != null) {
+      this.queryCaseListParams.projectId = window.sessionStorage.getItem(
+        "projectId"
+      );
       this.currentProjectName = window.sessionStorage.getItem("projectName");
       this.currentProjectId = window.sessionStorage.getItem("projectId");
     }
@@ -347,7 +437,7 @@ export default {
     this.getProtocol();
     this.getProject();
   },
-    beforeRouteLeave(to, from, next) {
+  beforeRouteLeave(to, from, next) {
     to.meta.keepAlive = false;
     next();
   }

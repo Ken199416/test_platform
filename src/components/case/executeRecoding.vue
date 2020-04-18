@@ -59,15 +59,23 @@
           </template>
         </el-table-column>
         <el-table-column prop="url" label="请求URL" width="200"></el-table-column>
-        <el-table-column  prop="formParams" label="请求参数" width="200">
+        <el-table-column  prop="requestParams" label="请求参数" width="200">
           <template slot-scope="scope">
-            <span v-if="scope.row.protocolId == 2 && scope.row.paramsType == 1">{{scope.row.jsonParams}}</span>
+            <span v-if="scope.row.protocolId == 2 && scope.row.paramsType == 1">{{scope.row.requestParams}}</span>
             <span v-if="scope.row.protocolId == 1">无参数</span>
             <span :key="index" v-for="(item,index) in scope.row.formParams">[ {{item.nameValue}} : {{item.paramValue}} ]<br></span>
           </template>
         </el-table-column>
-        <el-table-column prop="assertFlag" label="断言标志" width="150"></el-table-column>
-        <el-table-column prop="assertContent" label="预期断言" width="150"></el-table-column>
+        <el-table-column prop="assertFlag" label="断言标志" width="150">
+          <template slot-scope="scope">
+              <span :key="index" v-for="(item,index) in scope.row.assertFlag.split('<==>')">{{item}}<br/></span>
+          </template>
+        </el-table-column>
+        <el-table-column prop="assertContent" label="预期断言" width="150">
+          <template slot-scope="scope">
+              <span :key="index" v-for="(item,index) in scope.row.assertContent.split('<==>')">{{item}}<br/></span>
+          </template>
+        </el-table-column>
         <el-table-column prop="executeResponse" label="接口响应" width="300"></el-table-column>
 
         <el-table-column prop="username" label="执行人" width="95"></el-table-column>
@@ -139,7 +147,6 @@ export default {
       this.recodingTotal = response.total;
     },
     query(){
-      console.log(this.time);
       if(this.time != null &&  this.time[0] !== undefined){
         this.queryExecuteRecoding.startTime = this.time[0];
         this.queryExecuteRecoding.endTime = this.time[1];

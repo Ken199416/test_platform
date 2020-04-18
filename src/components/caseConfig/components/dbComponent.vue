@@ -102,6 +102,9 @@
         </div>
       </el-form>
     </el-card>
+
+<!-- sql 查询后的dialog -->
+
     <el-dialog
       title="SQL查询器查询结果"
       :visible.sync="SQLSelectDialogVisible"
@@ -114,29 +117,81 @@
       <p style="color:red;font-size:20px">选择要断言的字段和预期结果,数据结果集最多返回50条!</p>
       <br />
       <el-form
-        :inline="true"
         ref="addSQLSelectComponentFormRef"
-        :rules="addSQLSelectComponentFormRules"
-        :model="addSQLSelectComponentForm"
+        :rules="addSQLSelectRules"
+        :v-model="addSQLSelectForm"
       >
-        <el-form-item label="断言列" prop="assertFlag">
-          <el-select
+
+        <el-form-item label="SQL断言">
+          <el-switch v-model="switchInfo.isAssert"></el-switch>
+          <el-button v-if="switchInfo.isAssert"
+            type="primary"
+            style="margin-left:50px"
+            @click="addAssertDomain()"
+          >新增断言</el-button>
+        </el-form-item>
+
+        <template v-if="switchInfo.isAssert">
+          <el-form-item inline style="margin-left:120px"
+            v-for="(domain, index) in addSQLSelectForm.assertDomains"
+            :label="'断言' + (index+1)"
+            :key="domain.key"
+            :prop="'assertDomains.' + index + '.name'"
+            >
+
+            <el-select
             style="width:250px"
-            v-model="addSQLSelectComponentForm.assertFlag"
+            v-model="domain.name"
             placeholder="请选择表字段"
           >
             <el-option v-for="item in keyList" :key="item" :label="item" :value="item"></el-option>
           </el-select>
+            <el-input placeholder="请输入预期断言" v-model="domain.value" style="width:35%;margin-left:20px;"></el-input>
+
+            <el-button
+              type="danger"
+              @click.prevent="removeAssertDomain(domain)"
+              style="margin-left:20px;"
+            >删除</el-button>
+          </el-form-item>
+        </template>
+
+
+
+        <el-form-item label="SQL参数截取">
+          <el-switch v-model="switchInfo.isParams"></el-switch>
+          <el-button
+            v-if="switchInfo.isParams"
+            type="primary"
+            style="margin-left:50px"
+            @click="addParamsDomain()"
+          >新增截取</el-button>
         </el-form-item>
 
-        <el-form-item style="margin-left:25px" label="预期断言" prop="assertContent">
-          <el-input
-            prefix-icon="el-icon-key"
-            v-model="addSQLSelectComponentForm.assertContent"
-            placeholder="请输入预期断言"
-            style="width:500px"
-          ></el-input>
-        </el-form-item>
+        <template v-if="switchInfo.isParams" >
+          <el-form-item inline style="margin-left:120px"
+            v-for="(domain, index) in addSQLSelectForm.paramsDomains"
+            :label="'截取' + (index+1)"
+            :key="domain.key"
+            :prop="'paramsDomains.' + index + '.name'"
+            >
+          <el-select
+            style="width:250px"
+            v-model="domain.name"
+            placeholder="请选择表字段">
+            <el-option v-for="item in keyList" :key="item" :label="item" :value="item"></el-option>
+          </el-select>
+            <el-input placeholder="请输入引用名" v-model="domain.value" style="width:35%;margin-left:20px;"></el-input>
+             <el-input placeholder="请输入引用名描述" v-model="domain.desc" style="width:35%;margin-left:20px;"></el-input>
+
+            <el-button
+              type="danger"
+              @click.prevent="removeParamsDomain(domain)"
+              style="margin-left:20px;"
+            >删除</el-button>
+          </el-form-item>
+        </template>
+
       </el-form>
       <span slot="footer" class="dialog-footer">
         <el-button @click="SQLSelectDialogVisible = false">取 消</el-button>
@@ -151,11 +206,15 @@ export default {
   data() {
     return {
       loading: false,
-      addComponentForm: {},
+      addComponentForm: {
+        categoryId:"4"
+      },
       keyList: [],
       valueList:[],
       sqlId:0,
-      addSQLSelectComponentForm:{},
+      addSQLSelectComponentForm:{
+
+      },
       dataSourceList: [],
       SQLSelectDialogVisible: false,
       addSQLSelectComponentFormRules:{
@@ -178,28 +237,89 @@ export default {
       },
       projectList: [],
       componentList: [],
-      categoryId: 4
+      categoryId: 4,
+      addSQLSelectForm:{
+
+          assertDomains: [{
+            name:'',
+            value: ''
+          }]
+        ,
+          paramsDomains: [{
+            name:'',
+            value: '',
+            desc:''
+          }]
+      },
+      switchInfo:{
+        isAssert:false,
+        isParams:false
+      },
+      addSQLSelectRules:{}
     };
   },
   methods: {
-    async addSqlSelectComponent() {
-      this.addSQLSelectComponentForm.categoryId = 4;
-      console.log(this.addSQLSelectComponentForm);
-      this.$refs.addSQLSelectComponentFormRef.validate(async valid => {
-        if (valid) {
-          const { data: response } = await this.$http.post(
-            "/addComponent",
-            this.addSQLSelectComponentForm
-          );
-          if (response.code == 10000) {
-            this.$message.success("添加组件成功");
-            this.SQLSelectDialogVisible = false;
-            this.back();
-          } else {
-            this.$message.success("添加组件失败，请稍后重试");
-          }
+      removeParamsDomain(item) {
+        var index = this.addSQLSelectForm.paramsDomains.indexOf(item)
+        if (index !== -1) {
+          this.addSQLSelectForm.paramsDomains.splice(index, 1)
         }
-      })
+      },
+      addParamsDomain() {
+        this.addSQLSelectForm.paramsDomains.push({
+          name:'',
+          value: '',
+          desc:'',
+          key: Date.now()
+        });
+      },
+
+      removeAssertDomain(item) {
+        var index = this.addSQLSelectForm.assertDomains.indexOf(item)
+        if (index !== -1) {
+          this.addSQLSelectForm.assertDomains.splice(index, 1)
+        }
+      },
+      addAssertDomain() {
+        this.addSQLSelectForm.assertDomains.push({
+          name:'',
+          value: '',
+          key: Date.now()
+        });
+      },
+    async addSqlSelectComponent() {
+      let assertFlag = '';
+      let assertContent = '';
+      if(this.switchInfo.isAssert){
+        for(let i=0 ; i< this.addSQLSelectForm.assertDomains.length ;i++){
+        assertFlag += this.addSQLSelectForm.assertDomains[i].name + '<==>';
+        assertContent += this.addSQLSelectForm.assertDomains[i].value  + "<==>";
+        }
+      assertFlag = assertFlag.substring(0,assertFlag.length-4);   
+      assertContent = assertContent.substring(0,assertContent.length-4);
+      }
+      let referenceParamFlag = '';
+      let referenceParamContent = '';
+      let referenceParamDesc = "";
+      if(this.switchInfo.isParams){
+        for(let i=0 ; i< this.addSQLSelectForm.paramsDomains.length ;i++){
+        referenceParamFlag += this.addSQLSelectForm.paramsDomains[i].name + '<==>';
+        referenceParamContent += this.addSQLSelectForm.paramsDomains[i].value  + "<==>";
+        referenceParamDesc += this.addSQLSelectForm.paramsDomains[i].desc + "<==>"
+        }
+      referenceParamFlag = referenceParamFlag.substring(0,referenceParamFlag.length-4);
+      referenceParamContent = referenceParamContent.substring(0,referenceParamContent.length-4);
+      referenceParamDesc = referenceParamDesc.substring(0,referenceParamDesc.length-4);
+      }
+      this.addSQLSelectComponentForm.assertFlag = assertFlag;
+      this.addSQLSelectComponentForm.assertContent = assertContent;
+      this.addSQLSelectComponentForm.referenceParamFlag = referenceParamFlag;
+      this.addSQLSelectComponentForm.referenceParamContent = referenceParamContent;
+      this.addSQLSelectComponentForm.referenceParamDesc = referenceParamDesc;
+      console.log(this.addSQLSelectComponentForm);
+      this.$common.post("/addSqlSelectComponent",this.addSQLSelectComponentForm);
+      // 每写完，暂时暂不写这个功能
+
     },
     getSQLDate() {
       // 表单校验

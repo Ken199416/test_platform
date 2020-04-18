@@ -152,10 +152,6 @@
       </el-table-column>
     </el-table>
         <br/>
-
-
-
-
         <el-form-item style="margin-left:150px" label="请求地址" prop="url">
           <el-input
             :disabled="cid != 'add'"
@@ -322,7 +318,7 @@
             style="margin-left:50px"
             v-if="switchInfo.isReference"
             @click="addParamsDomain"
-          >新增断言</el-button>
+          >新增参数截取</el-button>
         </el-form-item>
 
         <template v-if="switchInfo.isReference">
@@ -430,7 +426,8 @@ export default {
             paramValue: "",
             paramDesc: ""
           }
-        ]
+        ],
+        preCaseGroupIndex:""
       },
       paramsDomains: [
           {

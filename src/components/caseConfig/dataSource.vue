@@ -82,7 +82,7 @@
             <el-tag v-if="scope.row.dbType==3" type="success">SQL SERVER</el-tag>
           </template>
         </el-table-column>
-        <el-table-column prop="url" label="请求url" width="350"></el-table-column>
+        <el-table-column prop="url" label="请求url"></el-table-column>
         <!-- <el-table-column prop="assertContent" label="断言内容" width="200"></el-table-column> -->
         <!-- 状态按钮 -->
         <!-- <el-table-column fixed="right" label="状态" width="100">
