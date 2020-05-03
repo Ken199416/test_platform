@@ -201,7 +201,8 @@ export default {
   methods: {
     //   运行job
       runJob(){
-          this.$message.error("我还在开发，别急")
+        this.$common.get('/runJob');
+        this.$message.success("已手动运行Job，请稍后在邮箱或者任务报告中查看运行结果");
       },
     //   添加job
     async addCaseGroupToJob(){
