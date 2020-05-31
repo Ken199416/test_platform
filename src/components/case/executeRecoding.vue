@@ -61,7 +61,7 @@
         <el-table-column prop="url" label="请求URL" width="200"></el-table-column>
         <el-table-column  prop="requestParams" label="请求参数" width="200">
           <template slot-scope="scope">
-            <span v-if="scope.row.protocolId == 2 && scope.row.paramsType == 1">{{scope.row.requestParams}}</span>
+            <span v-if="scope.row.protocolId == 2 && scope.row.paramsType == 1">{{scope.row.requestParams.length > 100 ? scope.row.requestParams.substring(0,100) : scope.row.requestParams}}</span>
             <span v-if="scope.row.protocolId == 1">无参数</span>
             <span :key="index" v-for="(item,index) in scope.row.formParams">[ {{item.nameValue}} : {{item.paramValue}} ]<br></span>
           </template>
@@ -76,12 +76,31 @@
               <span :key="index" v-for="(item,index) in scope.row.assertContent.split('<==>')">{{item}}<br/></span>
           </template>
         </el-table-column>
-        <el-table-column prop="executeResponse" label="接口响应" width="300"></el-table-column>
+        <el-table-column prop="executeResponse" label="接口响应" width="300">
+
+          <template slot-scope="scope">
+            <span>
+            {{scope.row.executeResponse.length > 100 ? scope.row.executeResponse.substring(0,100) + '......' : scope.row.executeResponse}}
+            </span>
+             <el-button v-if="scope.row.executeResponse.length > 100" type="primary" size="mini" @click='queryExecuteResponse(scope.row)'>查看更多</el-button>
+          </template>
+        </el-table-column>
 
         <el-table-column prop="username" label="执行人" width="95"></el-table-column>
 
         
       </el-table>
+
+      <!-- 查看更多的响应信息dialog -->
+      <el-dialog
+  title="Response"
+  :visible.sync="executeResponseDialog"
+  width="90%">
+  <el-input type="textarea" rows='23' v-model="allExecuteResponse"></el-input>
+  <span slot="footer" class="dialog-footer">
+    <el-button type="primary" @click="executeResponseDialog = false">朕知道了</el-button>
+  </span>
+</el-dialog>
 
       <!-- 分页区域 -->
       <el-pagination
@@ -121,7 +140,9 @@ export default {
           label: "执行失败"
         }
       ],
-      time: []
+      time: [],
+      executeResponseDialog:false,
+      allExecuteResponse:''
     };
   },
   methods: {
@@ -155,6 +176,10 @@ export default {
         this.queryExecuteRecoding.endTime = '';
       }
       this.getRecoding();
+    },
+    queryExecuteResponse(row){
+      this.allExecuteResponse = this.$common.formatJson(row.executeResponse);
+      this.executeResponseDialog = true;
     }
   },
   created() {

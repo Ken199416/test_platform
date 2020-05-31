@@ -91,7 +91,7 @@
             <el-button style="margin-top: 12px;" @click="resetActive(scope)">重 置</el-button>
           </template>
         </el-table-column>
-        <el-table-column prop="name" label="用例集名称" width="200">
+        <el-table-column prop="name" label="用例集名称" width="130%">
           <template slot-scope="scope">
             <el-popover placement="right" width="400px" trigger="click" width:300px>
               <el-table :data="scope.row.caseList" border>
@@ -104,12 +104,12 @@
             </el-popover>
           </template>
         </el-table-column>
-        <el-table-column prop="projectId" label="所属项目" width="130">
+        <el-table-column prop="projectId" label="所属项目" width="90%">
           <template slot-scope="scope">
             <el-tag type="warning">{{scope.row.projectName}}</el-tag>
           </template>
         </el-table-column>
-        <el-table-column prop label="动态参数" width="500">
+        <el-table-column prop label="动态参数" width="400%">
           <template slot-scope="scope">
             <el-row type="flex" justify="start">
               <el-col
@@ -128,9 +128,9 @@
           </template>
         </el-table-column>
 
-        <el-table-column prop="caseGroupDescribe" label="用例集描述" width="225"></el-table-column>
-        <el-table-column prop="waitTime" label="等待时间( S )" width="75"></el-table-column>
-        <el-table-column label="状态" width="70">
+        <el-table-column prop="caseGroupDescribe" label="用例集描述" width="150%"></el-table-column>
+        <el-table-column prop="waitTime" label="等待时间( S )" width="50%"></el-table-column>
+        <el-table-column label="状态" width="75%">
           <template slot-scope="scope">
             <el-tooltip
               v-if="scope.row.del"
@@ -156,7 +156,7 @@
         </el-table-column>
         <!-- 操作列 -->
 
-        <el-table-column label="操作" width="370">
+        <el-table-column label="操作" width="350%">
           <template slot-scope="scope">
             <el-tooltip
               class="item"

@@ -12,7 +12,7 @@
         <el-col style="margin-top:60px;margin-left:4%;margin-right:4%;" :span="4">
           <div @click="delProject()" style="cursor:pointer">
             <el-card style="background-color:#479DE3;height:95px;border-radius: 15px;">
-              <div style="text-align: center;font-size:35px;font-color:while">
+              <div style="text-align: center;font-size:37.5px;font-color:while">
                 <span>全平台</span>
               </div>
             </el-card>
@@ -26,7 +26,7 @@
         >
           <div @click="changeProject(item.id,item.name)" style="cursor:pointer">
             <el-card style="background-color:#479DE3;height:95px;border-radius: 15px;">
-              <div style="text-align: center;font-size:35px;font-color:while">
+              <div style="text-align: center;font-size:37.5px;font-color:while">
                 <span>{{item.name}}</span>
               </div>
             </el-card>

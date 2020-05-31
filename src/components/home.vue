@@ -5,9 +5,7 @@
     <el-header>
       <div>
         <img class="logoImg" src="../assets/img/userLogo.jpg" alt="用户头像" height="40px " />
-        <span>
-          <strong>测试平台</strong>
-        </span>
+          <!-- &nbsp;&nbsp;测试平台 -->
       </div>
       <span style="margin-left:80%">
         <el-menu
@@ -223,7 +221,7 @@ export default {
   background-color: #373d41;
   display: flex;
   // justify-content: space-between;
-  padding-left: 10px;
+  // padding-left: 10px;
   align-items: center;
   color: linen;
   font-size: 18px;

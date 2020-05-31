@@ -48,7 +48,7 @@
           <el-button icon="el-icon-search" @click="getJobCaseGroupListBySelect()"></el-button>
         </el-col>
         <el-col :span="10" style="text-align:right">
-          <el-button type="primary" @click="addJobDialog = true">添加组件</el-button>
+          <el-button type="primary" @click="addJobDialog = true">添加用例集</el-button>
         </el-col>
         <el-col :span="1" style="text-align:right">
           <el-button type="primary" @click="runJob()">运行Job</el-button>
@@ -200,8 +200,9 @@ export default {
   },
   methods: {
     //   运行job
-      runJob(){
-          this.$message.error("我还在开发，别急")
+      async runJob(){
+        this.$message.success("已手动运行job，请稍后查看邮件。。。");
+        const response = await this.$common.get("/runJob");
       },
     //   添加job
     async addCaseGroupToJob(){

@@ -186,7 +186,7 @@
   >
   <el-form  label-width="80px" :model="caseResult">
   <el-form-item label="响应结果">
-    <el-input contenteditable="true" type="textarea"  v-model="caseResult.responseStr"></el-input>
+    <el-input contenteditable="true" type="textarea"  rows=20 v-model="caseResult.responseStr"></el-input>
   </el-form-item>
   <el-form-item label="断言结果">
     <el-table

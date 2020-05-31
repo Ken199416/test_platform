@@ -463,7 +463,7 @@ export default {
       addFormRules: {
         name: [
           { required: true, message: "请输入您的用例名称", trigger: "blur" },
-          { min: 2, max: 20, message: "长度在 2 到 20 个字符", trigger: "blur" }
+          { min: 2, max: 40, message: "长度在 2 到 20 个字符", trigger: "blur" }
         ],
         protocolId: [
           { required: true, message: "请选择协议类型", trigger: "blur" }
@@ -560,6 +560,8 @@ export default {
       if (response.code == 10000) {
         this.assertResult = response.data;
         this.assertResultIndex = idnex;
+      }else{
+        this.$message.error("断言表达式错误，请检查！");
       }
     },
     async queryReference(idnex, value) {
@@ -584,7 +586,8 @@ export default {
             this.addCaseForm
           );
           if (response.code == 10000) {
-            this.responseStr = response.data.response;
+            // this.responseStr = response.data.response;
+            this.responseStr = this.$common.formatJson(response.data.response);
             this.loading = false;
             this.setAssertCaseDialog = true;
             this.setAssertCaseForm = response.params;
@@ -728,6 +731,11 @@ export default {
       }
     }
   },
+  // computed:{
+  //   responseStr : function(){
+  //     return this.$common.formatJson(this.responseStr);
+  //   }
+  // },
   created() {
     if(window.sessionStorage.getItem("projectId") != null && window.sessionStorage.getItem("projectName") != null){
           this.$global.currentProjectId = window.sessionStorage.getItem("projectId");
