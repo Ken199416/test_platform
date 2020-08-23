@@ -61,7 +61,7 @@
 
       <!-- 列表区域 -->
       <el-table :data="caseGroupList" border height="670" style="width: 100%">
-        <el-table-column type="expand" >
+        <el-table-column type="expand" fixed="left">
           <template slot-scope="scope" v-if="scope.row.caseList.length > 0">
             <el-steps
               :active="scope.row.executeIndex"
@@ -91,7 +91,7 @@
             <el-button style="margin-top: 12px;" @click="resetActive(scope)">重 置</el-button>
           </template>
         </el-table-column>
-        <el-table-column prop="name" label="用例集名称" width="130%">
+        <el-table-column prop="name" label="用例集名称" width="200">
           <template slot-scope="scope">
             <el-popover placement="right" width="400px" trigger="click" width:300px>
               <el-table :data="scope.row.caseList" border>
@@ -109,14 +109,14 @@
             <el-tag type="warning">{{scope.row.projectName}}</el-tag>
           </template>
         </el-table-column>
-        <el-table-column prop label="动态参数" width="400%">
+        <el-table-column prop label="动态参数" width="250">
           <template slot-scope="scope">
-            <el-row type="flex" justify="start">
+            <!-- <el-row type="flex" justify="start" :gutter="8">
               <el-col
                 style="margin-top:5px;text-align: center;"
                 :key="index"
                 v-for="(item,index) in scope.row.reference"
-                :span="6"
+                :span="24"
               >
                 <div class="grid-content bg-purple-dark">
                   <el-tooltip :content="item.referenceDesc" placement="top">
@@ -124,13 +124,20 @@
                   </el-tooltip>
                 </div>
               </el-col>
-            </el-row>
+            </el-row> -->
+
+            <span :key="index" v-for="(item,index) in scope.row.reference">
+              <el-tooltip :content="item.referenceDesc" placement="top">
+                <el-button style="margin-top:10px" type="primary" plain size="mini">{{item.referenceName}}</el-button>
+              </el-tooltip>
+              <br>
+            </span>
           </template>
         </el-table-column>
 
-        <el-table-column prop="caseGroupDescribe" label="用例集描述" width="150%"></el-table-column>
-        <el-table-column prop="waitTime" label="等待时间( S )" width="50%"></el-table-column>
-        <el-table-column label="状态" width="75%">
+        <el-table-column prop="caseGroupDescribe" label="用例集描述" width="250"></el-table-column>
+        <el-table-column prop="waitTime" label="等待时间( S )" width="75"></el-table-column>
+        <el-table-column label="状态" width="65">
           <template slot-scope="scope">
             <el-tooltip
               v-if="scope.row.del"
@@ -156,7 +163,7 @@
         </el-table-column>
         <!-- 操作列 -->
 
-        <el-table-column label="操作" width="350%">
+        <el-table-column label="操作" fixed="right" >
           <template slot-scope="scope">
             <el-tooltip
               class="item"
@@ -182,14 +189,7 @@
               @click="openAddCaseDialog(scope.row)"
               size="mini"
             >分配用例</el-button>
-            <el-button
-              v-if="scope.row.del"
-              type="primary"
-              icon="el-icon-edit-outline"
-              size="mini"
-              @click="openEditCaseDialog(scope.row)"
-            >调整用例</el-button>
-
+            <br><br>
             <el-tooltip
               class="item"
               effect="dark"
@@ -206,6 +206,13 @@
                 @click="runCaseGroup(scope.row)"
               ></el-button>
             </el-tooltip>
+            <el-button
+              v-if="scope.row.del"
+              type="primary"
+              icon="el-icon-edit-outline"
+              size="mini"
+              @click="openEditCaseDialog(scope.row)"
+            >调整用例</el-button>
 
             <!-- <el-tooltip
               class="item"
@@ -270,7 +277,6 @@
       </span>
     </el-dialog>
 
-
     <!--执行用例集异常弹窗 -->
     <el-dialog
       title="执行成功，断言失败！！！"
@@ -282,19 +288,18 @@
        ===> 用例【{{caseErrorResult.name}}】具体执行信息如下：
       </div>
       <el-form label-width="80px" :model="caseErrorResult">
-        <el-form-item label="请求参数" 
+        <el-form-item label="请求参数"
         v-if="caseErrorResult.protocolId == 2 && caseErrorResult.paramsType == 1">
           <el-input contenteditable="true" type="textarea" rows="10"
            v-model="caseErrorResult.jsonParams"></el-input>
         </el-form-item>
-        <el-form-item label="请求参数" 
+        <el-form-item label="请求参数"
         v-if="caseErrorResult.protocolId == 2 && caseErrorResult.paramsType == 2">
           <el-table  :data="caseErrorResult.domains" style="width: 100%">
             <el-table-column prop="nameValue" label="参数名" width="300"></el-table-column>
             <el-table-column prop="paramValue" label="参数值"></el-table-column>
           </el-table>
         </el-form-item>
-
 
         <el-form-item label="响应结果">
           <el-input contenteditable="true" type="textarea" rows="10"
@@ -594,22 +599,21 @@
   </div>
 </template>
 <script>
-import Sortable from "sortablejs";
+import Sortable from 'sortablejs'
 export default {
-  data() {
-
+  data () {
     //    验证数值
     var checkNumber = (rule, value, callback) => {
       // 验证数值的正则
-      const number = /^[0-9]*$/;
+      const number = /^[0-9]*$/
       if (number.test(value)) {
-        return callback();
+        return callback()
       }
-      callback(new Error("请输入正整数"));
-    };
+      callback(new Error('请输入正整数'))
+    }
     return {
       drawer: false,
-      currentGroupId: "",
+      currentGroupId: '',
       addCaseDialog: false,
       editCaseDialog: false,
       loading: false,
@@ -617,17 +621,17 @@ export default {
       projectOptions: [],
       // 获取用户列表
       queryCaseListParams: {
-        query: "",
+        query: '',
         pageNum: 1,
         pageSize: 100,
-        protocolId: "",
-        projectId: ""
+        protocolId: '',
+        projectId: ''
       },
       queryCaseGroupListParams: {
-        query: "",
+        query: '',
         pageNum: 1,
         pageSize: 10,
-        projectId: ""
+        projectId: ''
       },
       caseList: [],
       delCaseGroupParam: {
@@ -640,36 +644,36 @@ export default {
       addCaseGroupDialog: false,
       //   添加用户表单规则
       addCaseGroupForm: {
-        name: "",
-        projectId: "",
-        caseGroupDescribe: "",
-        waitTime: ""
+        name: '',
+        projectId: '',
+        caseGroupDescribe: '',
+        waitTime: ''
       },
       componentList: [],
       //   修改用户信息
       addCaseForm: {
-        caseId: "",
-        groupId: "",
-        pri: ""
+        caseId: '',
+        groupId: '',
+        pri: ''
       },
       editCaseForm: {},
       //   添加表单验证规则的对象
       addCaseGroupFormRules: {
         name: [
-          { required: true, message: "请输入您的用例名称", trigger: "blur" },
-          { min: 2, max: 20, message: "长度在 2 到 20 个字符", trigger: "blur" }
+          { required: true, message: '请输入您的用例名称', trigger: 'blur' },
+          { min: 2, max: 20, message: '长度在 2 到 20 个字符', trigger: 'blur' }
         ],
         projectId: [
-          { required: true, message: "请选择用例组所属项目", trigger: "blur" }
+          { required: true, message: '请选择用例组所属项目', trigger: 'blur' }
         ]
       },
       addCaseFormRules: {
         caseId: [
-          { required: true, message: "请选择要添加的用例", trigger: "blur" }
+          { required: true, message: '请选择要添加的用例', trigger: 'blur' }
         ],
         pri: [
-          { required: true, message: "请输入执行优先级", trigger: "blur" },
-          { validator: checkNumber, trigger: "blur" }
+          { required: true, message: '请输入执行优先级', trigger: 'blur' },
+          { validator: checkNumber, trigger: 'blur' }
         ]
       },
       editCaseFormRules: {},
@@ -681,367 +685,367 @@ export default {
       active: 0,
       executeCaseByIndexResponse: false,
       caseResult: {},
-      success: "success",
+      success: 'success',
       executeResult: true,
       editCaseGroupDialog: false,
       editCaseGroupForm: {},
       editCaseGroupFormRules: {
         name: [
-          { required: true, message: "请输入您的用例名称", trigger: "blur" },
-          { min: 2, max: 20, message: "长度在 2 到 20 个字符", trigger: "blur" }
+          { required: true, message: '请输入您的用例名称', trigger: 'blur' },
+          { min: 2, max: 20, message: '长度在 2 到 20 个字符', trigger: 'blur' }
         ],
         projectId: [
-          { required: true, message: "请选择用例组所属项目", trigger: "blur" }
+          { required: true, message: '请选择用例组所属项目', trigger: 'blur' }
         ]
       },
-      executeErrorDialog:false,
-      caseErrorResult:{
+      executeErrorDialog: false,
+      caseErrorResult: {
 
       },
-      errorCaseIndex:""
-    };
+      errorCaseIndex: ''
+    }
   },
   methods: {
-    openDebug() {
-      console.log("打开");
+    openDebug () {
+      console.log('打开')
     },
-    resetActive(scope) {
-      const index = scope.$index;
-      this.caseGroupList[index].executeIndex = 0;
-      const caseList = this.caseGroupList[index].caseList;
+    resetActive (scope) {
+      const index = scope.$index
+      this.caseGroupList[index].executeIndex = 0
+      const caseList = this.caseGroupList[index].caseList
       for (let i = 0; i < caseList.length; i++) {
         if (!caseList[i].result) {
-          caseList[i].result = !caseList[i].result;
+          caseList[i].result = !caseList[i].result
         }
       }
     },
-    async next(scope) {
-      const index = scope.$index;
+    async next (scope) {
+      const index = scope.$index
       if (this.caseGroupList[index].executeIndex++ > scope.row.caseTotal - 1) {
-        this.caseGroupList[index].executeIndex = 0;
+        this.caseGroupList[index].executeIndex = 0
       } else {
-        this.loading = true;
+        this.loading = true
         const response = await this.$common.get(
-          "/runCaseByIndex?index=" +
+          '/runCaseByIndex?index=' +
             this.caseGroupList[index].executeIndex +
-            "&groupId=" +
+            '&groupId=' +
             scope.row.id
-        );
+        )
         if (response.code == 10000) {
-          this.caseResult = response.params;
-          this.caseGroupList[scope.$index].caseList[this.caseGroupList[index].executeIndex - 1].result = response.data.success;
+          this.caseResult = response.params
+          this.caseGroupList[scope.$index].caseList[this.caseGroupList[index].executeIndex - 1].result = response.data.success
           // 断言成功
           if (response.data.success) {
-            this.loading = false;
+            this.loading = false
           } else {
             // 断言失败
-            this.loading = false;
-            this.$message.error(response.msg);
+            this.loading = false
+            this.$message.error(response.msg)
           }
           // 执行成功,弹窗标志位true
-          this.executeCaseByIndexResponse = true;
+          this.executeCaseByIndexResponse = true
         } else {
           this.caseGroupList[scope.$index].caseList[
             this.caseGroupList[index].executeIndex - 1
-          ].result = false;
-          this.loading = false;
-          this.$message.error(response.msg);
+          ].result = false
+          this.loading = false
+          this.$message.error(response.msg)
         }
       }
     },
-    async getCaseListByCaseGroupId(event, id) {
+    async getCaseListByCaseGroupId (event, id) {
       // 剪头回来继续写，先展示一个dialog，然后展示信息，可以选择利用嵌套信息
       // console.log(id);
       const response = await this.$common.get(
-        "/getGroupCaseList?groupId=" + id
-      );
-      this.caseList = response.data;
+        '/getGroupCaseList?groupId=' + id
+      )
+      this.caseList = response.data
     },
-    async runCaseGroup(row) {
-      this.loading = true;
-      const response = await this.$common.get("/runGroupCaseById?id=" + row.id);
+    async runCaseGroup (row) {
+      this.loading = true
+      const response = await this.$common.get('/runGroupCaseById?id=' + row.id)
       if (response.code == 10000 && response.msg != '执行失败') {
-        this.$message.success(response.msg);
-        this.loading = false;
+        this.$message.success(response.msg)
+        this.loading = false
       } else {
-        this.$message.error(response.msg);
-        this.caseErrorResult = response.data.errorCaseInfo;
-        this.errorCaseIndex = response.total;
-        this.loading = false;
-        this.executeErrorDialog = true;
+        this.$message.error(response.msg)
+        this.caseErrorResult = response.data.errorCaseInfo
+        this.errorCaseIndex = response.total
+        this.loading = false
+        this.executeErrorDialog = true
       }
-      this.loading = false;
+      this.loading = false
     },
-    async delGroupCase(row) {
-      this.delGroupCaseParams.id = row.crgId;
-      this.delGroupCaseParams.groupId = this.currentGroupId;
+    async delGroupCase (row) {
+      this.delGroupCaseParams.id = row.crgId
+      this.delGroupCaseParams.groupId = this.currentGroupId
       const response = await this.$common.get(
-        "/delGroupCase",
+        '/delGroupCase',
         this.delGroupCaseParams
-      );
-      this.groupCaseList = response.data;
+      )
+      this.groupCaseList = response.data
     },
-    async changePri(row) {
-      this.changePriParams.id = row.crgId;
-      this.changePriParams.pri = row.pri;
-      this.changePriParams.groupId = this.currentGroupId;
+    async changePri (row) {
+      this.changePriParams.id = row.crgId
+      this.changePriParams.pri = row.pri
+      this.changePriParams.groupId = this.currentGroupId
       const response = await this.$common.get(
-        "/updateGroupCase",
+        '/updateGroupCase',
         this.changePriParams
-      );
-      this.groupCaseList = response.data;
+      )
+      this.groupCaseList = response.data
     },
-    async openEditCaseDialog(row) {
-      this.currentGroupId = row.id;
-      this.editCaseDialog = true;
+    async openEditCaseDialog (row) {
+      this.currentGroupId = row.id
+      this.editCaseDialog = true
       const response = await this.$common.get(
-        "/getGroupCaseList?groupId=" + row.id
-      );
+        '/getGroupCaseList?groupId=' + row.id
+      )
       // console.log(response.data);
-      this.groupCaseList = response.data;
+      this.groupCaseList = response.data
     },
-    async addCase() {
+    async addCase () {
       this.$refs.addCaseFormRef.validate(async valid => {
         if (valid) {
           const response = await this.$common.post(
-            "/caseGroupAddCase",
+            '/caseGroupAddCase',
             this.addCaseForm
-          );
-          this.$message.success(response.msg);
+          )
+          this.$message.success(response.msg)
           if (response.code == 10000) {
-            this.addCaseDialog = false;
+            this.addCaseDialog = false
           } else {
           }
         }
-      });
+      })
     },
-    async getCaseList(query) {
-      if (query !== "") {
-        this.queryCaseListParams.query = query;
+    async getCaseList (query) {
+      if (query !== '') {
+        this.queryCaseListParams.query = query
         const response = await this.$common.get(
-          "/getAllCase",
+          '/getAllCase',
           this.queryCaseListParams
-        );
-        this.caseList = response.data;
+        )
+        this.caseList = response.data
       }
     },
 
-    openAddCaseDialog(row) {
-      this.addCaseForm.groupId = row.id;
+    openAddCaseDialog (row) {
+      this.addCaseForm.groupId = row.id
       // 打开弹出时，设置项目ID，
-      this.queryCaseListParams.projectId = row.projectId;
-      this.addCaseDialog = true;
+      this.queryCaseListParams.projectId = row.projectId
+      this.addCaseDialog = true
     },
-    addCaseOpenDialog() {
-      this.getAllComponent();
-      this.addDialogVisible = true;
+    addCaseOpenDialog () {
+      this.getAllComponent()
+      this.addDialogVisible = true
     },
-    getCaseGroupListBySelect() {
-      this.queryCaseGroupListParams.pageNum = 1;
-      this.queryCaseGroupListParams.pageSize = 10;
-      this.getAllCaseGroup();
+    getCaseGroupListBySelect () {
+      this.queryCaseGroupListParams.pageNum = 1
+      this.queryCaseGroupListParams.pageSize = 10
+      this.getAllCaseGroup()
     },
-    async getAllCaseGroup() {
-      const { data: response } = await this.$http.get("/getAllCaseGroup", {
+    async getAllCaseGroup () {
+      const { data: response } = await this.$http.get('/getAllCaseGroup', {
         params: this.queryCaseGroupListParams
-      });
+      })
       if (response.code != 10000) {
-        this.$message.error(response.msg);
+        this.$message.error(response.msg)
       } else {
-        this.caseGroupList = response.data;
-        this.caseGroupTotal = response.total;
+        this.caseGroupList = response.data
+        this.caseGroupTotal = response.total
       }
     },
-    async delCase(row) {
-      this.delCaseGroupParam.groupId = row.id;
-      this.delCaseGroupParam.flag = row.del;
-      const { data: response } = await this.$http.get("/delGroup", {
+    async delCase (row) {
+      this.delCaseGroupParam.groupId = row.id
+      this.delCaseGroupParam.flag = row.del
+      const { data: response } = await this.$http.get('/delGroup', {
         params: this.delCaseGroupParam
-      });
+      })
       if (response.code != 10000) {
-        this.$message.error("服务器开小差了，请稍后重试或者联系管理员！");
+        this.$message.error('服务器开小差了，请稍后重试或者联系管理员！')
       } else {
         if (!row.del) {
           this.$message({
-            type: "success",
-            message: "该用例已停用!"
-          });
+            type: 'success',
+            message: '该用例已停用!'
+          })
         } else {
           this.$message({
-            type: "success",
-            message: "该用例已恢复使用!"
-          });
+            type: 'success',
+            message: '该用例已恢复使用!'
+          })
         }
       }
-      this.getAllCaseGroup();
+      this.getAllCaseGroup()
     },
-    async changeDel(row) {
-      console.log(row);
+    async changeDel (row) {
+      console.log(row)
       // 停用
       if (!row.del) {
-        await this.$confirm("是否停用该用例集?", "提示", {
-          confirmButtonText: "停用",
-          cancelButtonText: "取消",
-          type: "warning"
+        await this.$confirm('是否停用该用例集?', '提示', {
+          confirmButtonText: '停用',
+          cancelButtonText: '取消',
+          type: 'warning'
         })
           .then(() => {
-            this.delCase(row);
+            this.delCase(row)
           })
           .catch(() => {
-            this.getAllCaseGroup();
+            this.getAllCaseGroup()
             this.$message({
-              type: "info",
-              message: "已取消停用"
-            });
-          });
+              type: 'info',
+              message: '已取消停用'
+            })
+          })
       } else {
-        await this.$confirm("是否恢复使用该用例集?", "提示", {
-          confirmButtonText: "恢复",
-          cancelButtonText: "取消",
-          type: "warning"
+        await this.$confirm('是否恢复使用该用例集?', '提示', {
+          confirmButtonText: '恢复',
+          cancelButtonText: '取消',
+          type: 'warning'
         })
           .then(() => {
-            this.delCase(row);
+            this.delCase(row)
             // console.log("删除了");
           })
           .catch(() => {
-            this.getAllCaseGroup();
+            this.getAllCaseGroup()
             this.$message({
-              type: "info",
-              message: "已取消恢复使用"
-            });
-          });
+              type: 'info',
+              message: '已取消恢复使用'
+            })
+          })
       }
     },
     // 监听每页显示数的改变
-    handleSizeChange(newSize) {
-      this.queryCaseGroupListParams.pageSize = newSize;
-      this.getCaseList();
+    handleSizeChange (newSize) {
+      this.queryCaseGroupListParams.pageSize = newSize
+      this.getCaseList()
     },
     // 监听页码的改变
-    handleCurrentChange(newPage) {
-      this.queryCaseGroupListParams.pageNum = newPage;
-      this.getCaseList();
+    handleCurrentChange (newPage) {
+      this.queryCaseGroupListParams.pageNum = newPage
+      this.getCaseList()
     },
     // 发送添加用例组的请求
-    async addCaseGroup() {
+    async addCaseGroup () {
       this.$refs.addCaseGroupFormRef.validate(async valid => {
         if (valid) {
           const { data: response } = await this.$http.post(
-            "/addCaseGroup",
+            '/addCaseGroup',
             this.addCaseGroupForm
-          );
+          )
           if (response.code == 10000) {
-            this.$message.success(response.msg);
-            this.addCaseGroupDialog = false;
+            this.$message.success(response.msg)
+            this.addCaseGroupDialog = false
           } else {
-            this.$message.error(response.msg);
-            this.addCaseGroupDialog = true;
+            this.$message.error(response.msg)
+            this.addCaseGroupDialog = true
           }
         } else {
         }
-        this.getAllCaseGroup();
-      });
+        this.getAllCaseGroup()
+      })
     },
-    async showDialogVisible(caseInfo) {
-      this.editDialogVisible = true;
+    async showDialogVisible (caseInfo) {
+      this.editDialogVisible = true
       const { data: response } = await this.$http.get(
-        "/getCaseById?id=" + caseInfo.id
-      );
+        '/getCaseById?id=' + caseInfo.id
+      )
       if (response.code == 10000) {
-        this.editCaseForm = response.data;
+        this.editCaseForm = response.data
       } else {
-        this.$message.error(response.msg);
+        this.$message.error(response.msg)
       }
     },
     // 发送修改用例的请求
-    async editCase() {
+    async editCase () {
       this.$refs.editCaseFormRef.validate(async valid => {
         if (valid) {
           const { data: response } = await this.$http.post(
-            "/editCase",
+            '/editCase',
             this.editCaseForm
-          );
+          )
           if (response.code == 10000) {
-            this.$message.success(response.msg);
-            this.editDialogVisible = false;
-            this.getCaseList();
+            this.$message.success(response.msg)
+            this.editDialogVisible = false
+            this.getCaseList()
           } else {
-            this.$message.error(response.msg);
+            this.$message.error(response.msg)
           }
         } else {
         }
-      });
+      })
     },
-    closeAdd() {
-      this.$refs.addCaseGroupFormRef.resetFields();
+    closeAdd () {
+      this.$refs.addCaseGroupFormRef.resetFields()
     },
-    closeAddCase() {
-      this.$refs.addCaseFormRef.resetFields();
-      this.getAllCaseGroup();
+    closeAddCase () {
+      this.$refs.addCaseFormRef.resetFields()
+      this.getAllCaseGroup()
     },
-    closeEdit() {
-      this.$refs.editCaseGroupFormRef.resetFields();
+    closeEdit () {
+      this.$refs.editCaseGroupFormRef.resetFields()
     },
-    closeChange(){
-      this.getAllCaseGroup();
+    closeChange () {
+      this.getAllCaseGroup()
     },
-    async getProject() {
-      const { data: response } = await this.$http.get("/getAllProject");
-      this.projectOptions = response.data;
+    async getProject () {
+      const { data: response } = await this.$http.get('/getAllProject')
+      this.projectOptions = response.data
     },
-    async runCaseById(id) {
-      this.loading = true;
-      const { data: response } = await this.$http.get("/runCaseById?id=" + id);
-      this.loading = false;
+    async runCaseById (id) {
+      this.loading = true
+      const { data: response } = await this.$http.get('/runCaseById?id=' + id)
+      this.loading = false
       if (response.code == 10000) {
-        this.$message.success(response.msg);
+        this.$message.success(response.msg)
       } else {
-        this.$message.error(response.msg);
+        this.$message.error(response.msg)
       }
     },
-    async getExecuteRecoding(cid) {
-      this.$router.push("/case/executeRecoding/" + cid);
+    async getExecuteRecoding (cid) {
+      this.$router.push('/case/executeRecoding/' + cid)
     },
-    async openEditDialog(id) {
-      const response = await this.$common.get("/getCaseGroupInfoById?id=" + id);
-      this.editCaseGroupForm = response.data;
-      this.editCaseGroupDialog = true;
+    async openEditDialog (id) {
+      const response = await this.$common.get('/getCaseGroupInfoById?id=' + id)
+      this.editCaseGroupForm = response.data
+      this.editCaseGroupDialog = true
     },
-    async editCaseGroup() {
+    async editCaseGroup () {
       this.$refs.editCaseGroupFormRef.validate(async valid => {
         if (valid) {
           const response = await this.$common.post(
-            "/editCaseGroupInfoById",
+            '/editCaseGroupInfoById',
             this.editCaseGroupForm
-          );
-          this.$message.success(response.msg);
-          this.editCaseGroupDialog = false;
-          this.getAllCaseGroup();
+          )
+          this.$message.success(response.msg)
+          this.editCaseGroupDialog = false
+          this.getAllCaseGroup()
         } else {
-          console.log(表单格式错误);
+          console.log(表单格式错误)
         }
-      });
+      })
     }
   },
-  created() {
+  created () {
     if (
-      window.sessionStorage.getItem("projectId") != null &&
-      window.sessionStorage.getItem("projectName") != null
+      window.sessionStorage.getItem('projectId') != null &&
+      window.sessionStorage.getItem('projectName') != null
     ) {
       this.$global.currentProjectId = window.sessionStorage.getItem(
-        "projectId"
-      );
+        'projectId'
+      )
       this.$global.currentProjectName = window.sessionStorage.getItem(
-        "projectName"
-      );
-      this.queryCaseGroupListParams.projectId = this.$global.currentProjectId;
-      this.addCaseGroupForm.projectId = this.$global.currentProjectId;
+        'projectName'
+      )
+      this.queryCaseGroupListParams.projectId = this.$global.currentProjectId
+      this.addCaseGroupForm.projectId = this.$global.currentProjectId
     }
-    this.getAllCaseGroup();
-    this.getProject();
+    this.getAllCaseGroup()
+    this.getProject()
   }
-};
+}
 </script>
 <style lang="less" scoped>
     .textarea-inherit {

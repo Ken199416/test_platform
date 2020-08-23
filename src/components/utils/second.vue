@@ -25,40 +25,39 @@
         </el-col>
       </el-row>
     </el-card>
-    
+
   </div>
 </template>
 <script>
 export default {
-  data() {
+  data () {
     return {
       projectList: [],
-      privateUtilsList:[]
-    };
+      privateUtilsList: []
+    }
   },
   methods: {
-    async getAllUtils(){
-      const data = await this.$common.get("/getAllUtils");
-      this.privateUtilsList = data.data;
-      console.log(data);
-
+    async getAllUtils () {
+      const data = await this.$common.get('/getAllUtils')
+      this.privateUtilsList = data.data
+      console.log(data)
     },
-    async getAllProject() {
-      const data = await this.$common.getAllProject();
-      this.projectList = data;
+    async getAllProject () {
+      const data = await this.$common.getAllProject()
+      this.projectList = data
     },
 
-    async openUtilsDialog(id){
-        // 通过id去后端拿这个dialog的信息，一些title等的详细信息
-        // 然后打开dialog弹窗
+    async openUtilsDialog (id) {
+      // 通过id去后端拿这个dialog的信息，一些title等的详细信息
+      // 然后打开dialog弹窗
 
-    },
-   
+    }
+
   },
-  created() {
-    this.getAllProject();
-    this.getAllUtils();
+  created () {
+    this.getAllProject()
+    this.getAllUtils()
   }
-};
+}
 </script>
 <style lang="less" scoped></style>

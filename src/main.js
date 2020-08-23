@@ -10,24 +10,26 @@ import axios from 'axios'
 import common from './CommonFunction/common.js'
 import global from './CommonFunction/global.js'
 // axios.defaults.baseURL = 'http://hmj.mbg17.cn:8888/autoTest/platform'
-axios.defaults.baseURL = 'http://127.0.0.1:8888/autoTest/platform'
+// axios.defaults.baseURL = 'http://192.168.3.69:8888/autoTest/platform'
+axios.defaults.baseURL = 'http://localhost:8888/autoTest/platform'
+
 axios.interceptors.request.use(request => {
-  /*判断token存在   登录拦截*/
-  if(window.localStorage.getItem("token")){
-    /*设置统一的header*/
-    request.headers.Authorization  = window.localStorage.getItem("token");
+  /* 判断token存在   登录拦截 */
+  if (window.localStorage.getItem('token')) {
+    /* 设置统一的header */
+    request.headers.Authorization = window.localStorage.getItem('token')
   }
-  return request;
-});
+  return request
+})
 // 响应拦截
-axios.interceptors.response.use((response) =>{
-  if(response.data.code !== 10000){
-    if(response.data.code === 40009){
+axios.interceptors.response.use((response) => {
+  if (response.data.code !== 10000) {
+    if (response.data.code === 40009) {
       // 跳转到登录页面
-      vm.$router.push('/login');
+      vm.$router.push('/login')
     }
   }
-  return response;
+  return response
 })
 Vue.prototype.$http = axios
 Vue.prototype.$common = common
@@ -40,4 +42,3 @@ const vm = new Vue({
 }).$mount('#app')
 
 export default vm
- 

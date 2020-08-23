@@ -61,7 +61,7 @@
         <el-table-column prop="url" label="请求URL" width="200"></el-table-column>
         <el-table-column  prop="requestParams" label="请求参数" width="200">
           <template slot-scope="scope">
-            <span v-if="scope.row.protocolId == 2 && scope.row.paramsType == 1">{{scope.row.requestParams.length > 100 ? scope.row.requestParams.substring(0,100) : scope.row.requestParams}}</span>
+            <span v-if="scope.row.protocolId == 2 && scope.row.paramsType == 1">{{scope.row.requestParams}}</span>
             <span v-if="scope.row.protocolId == 1">无参数</span>
             <span :key="index" v-for="(item,index) in scope.row.formParams">[ {{item.nameValue}} : {{item.paramValue}} ]<br></span>
           </template>
@@ -88,7 +88,6 @@
 
         <el-table-column prop="username" label="执行人" width="95"></el-table-column>
 
-        
       </el-table>
 
       <!-- 查看更多的响应信息dialog -->
@@ -117,74 +116,74 @@
 </template>
 <script>
 export default {
-  props: ["cid"],
-  data() {
+  props: ['cid'],
+  data () {
     return {
       recoding: [],
       queryExecuteRecoding: {
         cid: 0,
         pageNum: 1,
         pageSize: 10,
-        startTime:'',
-        endTime:''
+        startTime: '',
+        endTime: ''
       },
       recodingTotal: 10,
       executeResult: -1,
       executeResults: [
         {
           value: 1,
-          label: "执行成功"
+          label: '执行成功'
         },
         {
           value: 0,
-          label: "执行失败"
+          label: '执行失败'
         }
       ],
       time: [],
-      executeResponseDialog:false,
-      allExecuteResponse:''
-    };
-  },
-  methods: {
-    black(){
-      this.$router.push('/case/single');
-    },
-    // 监听每页显示数的改变
-    handleSizeChange(newSize) {
-      this.queryExecuteRecoding.pageSize = newSize;
-      this.getRecoding();
-    },
-    // 监听页码的改变
-    handleCurrentChange(newPage) {
-      this.queryExecuteRecoding.pageNum = newPage;
-      this.getRecoding();
-    },
-    async getRecoding() {
-      this.queryExecuteRecoding.cid = parseInt(this.cid);
-      const { data: response } = await this.$http.get("/getExecuteRecoding", {
-        params: this.queryExecuteRecoding
-      });
-      this.recoding = response.data;
-      this.recodingTotal = response.total;
-    },
-    query(){
-      if(this.time != null &&  this.time[0] !== undefined){
-        this.queryExecuteRecoding.startTime = this.time[0];
-        this.queryExecuteRecoding.endTime = this.time[1];
-      }else{
-        this.queryExecuteRecoding.startTime = '';
-        this.queryExecuteRecoding.endTime = '';
-      }
-      this.getRecoding();
-    },
-    queryExecuteResponse(row){
-      this.allExecuteResponse = this.$common.formatJson(row.executeResponse);
-      this.executeResponseDialog = true;
+      executeResponseDialog: false,
+      allExecuteResponse: ''
     }
   },
-  created() {
-    this.getRecoding();
+  methods: {
+    black () {
+      this.$router.push('/case/single')
+    },
+    // 监听每页显示数的改变
+    handleSizeChange (newSize) {
+      this.queryExecuteRecoding.pageSize = newSize
+      this.getRecoding()
+    },
+    // 监听页码的改变
+    handleCurrentChange (newPage) {
+      this.queryExecuteRecoding.pageNum = newPage
+      this.getRecoding()
+    },
+    async getRecoding () {
+      this.queryExecuteRecoding.cid = parseInt(this.cid)
+      const { data: response } = await this.$http.get('/getExecuteRecoding', {
+        params: this.queryExecuteRecoding
+      })
+      this.recoding = response.data
+      this.recodingTotal = response.total
+    },
+    query () {
+      if (this.time != null && this.time[0] !== undefined) {
+        this.queryExecuteRecoding.startTime = this.time[0]
+        this.queryExecuteRecoding.endTime = this.time[1]
+      } else {
+        this.queryExecuteRecoding.startTime = ''
+        this.queryExecuteRecoding.endTime = ''
+      }
+      this.getRecoding()
+    },
+    queryExecuteResponse (row) {
+      this.allExecuteResponse = this.$common.formatJson(row.executeResponse)
+      this.executeResponseDialog = true
+    }
+  },
+  created () {
+    this.getRecoding()
   }
-};
+}
 </script>
 <style lang="less" scoped></style>

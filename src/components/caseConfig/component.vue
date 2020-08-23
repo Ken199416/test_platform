@@ -28,10 +28,9 @@
           </el-select>
         </el-col>
 
-
         <el-col :span="3" v-else>
           <el-select disabled clearable v-model="this.$global.currentProjectName" placeholder="请选择所属项目">
-            <el-option 
+            <el-option
               v-for="item in projectOptions"
               :key="item.id"
               :label="item.name"
@@ -132,8 +131,8 @@
     <el-drawer title="选择添加组件类别" :visible.sync="drawer" :with-header="false">
       <div style="margin-top:50px;text-align:center">
         <span style="font-size:25px">选择添加组件类别</span><br>
-        <div style="margin-top:25px;marign-left:50px;marign-right:50px" :key="item.id" v-for="item in componentCatrgoryList"> 
-            <el-button size="medium" round @click="toAddComponentByUrl(item.addComponentUrl)"  type="primary" 
+        <div style="margin-top:25px;marign-left:50px;marign-right:50px" :key="item.id" v-for="item in componentCatrgoryList">
+            <el-button size="medium" round @click="toAddComponentByUrl(item.addComponentUrl)"  type="primary"
                     style="margin-top:10px">{{item.name}}</el-button><br/><br/>
             <div style="text-align:left;margin-left:100px;margin-right:100px" ><strong>使用说明</strong>：{{item.componentCategoryDesc}}</div>
         </div>
@@ -143,14 +142,14 @@
 </template>
 <script>
 export default {
-  data() {
+  data () {
     // json校验
     var checkJson = (rule, value, callback) => {
       if (this.isJSON(value)) {
-        return callback();
+        return callback()
       }
-      callback(new Error("JSON格式有误，请检查"));
-    };
+      callback(new Error('JSON格式有误，请检查'))
+    }
     return {
       // 文本域默认高度
       textareaHigh: 5,
@@ -160,11 +159,11 @@ export default {
       projectOptions: [],
       // 查询组件条件数据
       queryComponentListParams: {
-        query: "",
+        query: '',
         pageNum: 1,
         pageSize: 10,
-        projectId: "",
-        categoryId: ""
+        projectId: '',
+        categoryId: ''
       },
       // 删除用户表单数据
       delComponentParam: {
@@ -174,151 +173,151 @@ export default {
       componentList: [],
       componentTotal: 0,
       //   添加组件第一步表单验证规则的对象
-      
-        // params: [{ validator: checkJson, trigger: "blur" }],
+
+      // params: [{ validator: checkJson, trigger: "blur" }],
 
       drawer: false,
-      componentCatrgoryList:"",
-      categorys:[]
-    };
+      componentCatrgoryList: '',
+      categorys: []
+    }
   },
   methods: {
     // 跳转到对应的url
-    toAddComponentByUrl(url){
-      this.drawer = false;
-      this.$router.push(url);
+    toAddComponentByUrl (url) {
+      this.drawer = false
+      this.$router.push(url)
     },
     // 查看组件详情
-    toComponentInfo() {},
+    toComponentInfo () {},
     // 前往修改组件
-    toEditComponent(cid) {
+    toEditComponent (cid) {
       // this.$router.push("/case/editComponent/" + cid);
       // 更改通过后台获取具体的编辑路由地址
     },
-// 打开添加组件抽屉，加载组件跳转地址
-    async addComponentGo() {
-      this.drawer = true;
-      const {data : response} = await this.$http.get("getAllComponentCategory");
-      this.componentCatrgoryList = response.data;
+    // 打开添加组件抽屉，加载组件跳转地址
+    async addComponentGo () {
+      this.drawer = true
+      const { data: response } = await this.$http.get('getAllComponentCategory')
+      this.componentCatrgoryList = response.data
     },
-// 获取组件类别
-    async getComponentCategory() {
+    // 获取组件类别
+    async getComponentCategory () {
       const { data: response } = await this.$http.get(
-        "/getAllComponentCategory"
-      );
-      this.getProject();
-      this.categorys = response.data;
+        '/getAllComponentCategory'
+      )
+      this.getProject()
+      this.categorys = response.data
     },
 
     // 获取组件列表
-    async getComponentList() {
-      const { data: response } = await this.$http.get("/getComponentList", {
+    async getComponentList () {
+      const { data: response } = await this.$http.get('/getComponentList', {
         params: this.queryComponentListParams
-      });
+      })
       if (response.code == 10000) {
-        this.componentList = response.data;
-        this.componentTotal = response.total;
+        this.componentList = response.data
+        this.componentTotal = response.total
       } else {
-        this.$message.error(response.msg);
+        this.$message.error(response.msg)
       }
     },
     // 通过查询获取组件列表
-    async getComponentListBySelect() {
-      this.queryComponentListParams.pageNum = 1;
-      this.queryComponentListParams.pageSize = 10;
-      this.getComponentList();
+    async getComponentListBySelect () {
+      this.queryComponentListParams.pageNum = 1
+      this.queryComponentListParams.pageSize = 10
+      this.getComponentList()
     },
     // 停用组件
-    async delComponent(row) {
-      this.delComponentParam.id = row.id;
-      this.delComponentParam.del = row.del;
-      const { data: response } = await this.$http.get("/toDelComponent", {
+    async delComponent (row) {
+      this.delComponentParam.id = row.id
+      this.delComponentParam.del = row.del
+      const { data: response } = await this.$http.get('/toDelComponent', {
         params: this.delComponentParam
-      });
+      })
       if (response.code != 10000) {
-        this.$message.error("服务器开小差了，请稍后重试或者联系管理员！");
+        this.$message.error('服务器开小差了，请稍后重试或者联系管理员！')
       }
       if (!row.del) {
         this.$message({
-          type: "success",
-          message: "该组件已停用!"
-        });
+          type: 'success',
+          message: '该组件已停用!'
+        })
       } else {
         this.$message({
-          type: "success",
-          message: "该组件已恢复使用!"
-        });
+          type: 'success',
+          message: '该组件已恢复使用!'
+        })
       }
-      this.getComponentListBySelect();
+      this.getComponentListBySelect()
     },
     // 改变组件状态
-    async changeDel(row) {
+    async changeDel (row) {
       // 停用
       if (!row.del) {
-        await this.$confirm("是否停用该组件?", "提示", {
-          confirmButtonText: "停用",
-          cancelButtonText: "取消",
-          type: "warning"
+        await this.$confirm('是否停用该组件?', '提示', {
+          confirmButtonText: '停用',
+          cancelButtonText: '取消',
+          type: 'warning'
         })
           .then(() => {
-            this.delComponent(row);
+            this.delComponent(row)
           })
           .catch(() => {
-            row.del = true;
+            row.del = true
             this.$message({
-              type: "info",
-              message: "已取消停用"
-            });
-          });
+              type: 'info',
+              message: '已取消停用'
+            })
+          })
       } else {
-        await this.$confirm("是否恢复使用该组件?", "提示", {
-          confirmButtonText: "恢复",
-          cancelButtonText: "取消",
-          type: "warning"
+        await this.$confirm('是否恢复使用该组件?', '提示', {
+          confirmButtonText: '恢复',
+          cancelButtonText: '取消',
+          type: 'warning'
         })
           .then(() => {
-            this.delComponent(row);
+            this.delComponent(row)
           })
           .catch(() => {
-            row.del = false;
+            row.del = false
             this.$message({
-              type: "info",
-              message: "已取消恢复使用"
-            });
-          });
+              type: 'info',
+              message: '已取消恢复使用'
+            })
+          })
       }
     },
     // 监听每页显示数的改变
-    handleSizeChange(newSize) {
-      this.queryComponentListParams.pageSize = newSize;
-      this.getComponentList();
+    handleSizeChange (newSize) {
+      this.queryComponentListParams.pageSize = newSize
+      this.getComponentList()
     },
     // 监听页码的改变
-    handleCurrentChange(newPage) {
-      this.queryComponentListParams.pageNum = newPage;
-      this.getComponentList();
+    handleCurrentChange (newPage) {
+      this.queryComponentListParams.pageNum = newPage
+      this.getComponentList()
     },
-    async getProject() {
-      const { data: response } = await this.$http.get("/getAllProject");
-      this.projectOptions = response.data;
+    async getProject () {
+      const { data: response } = await this.$http.get('/getAllProject')
+      this.projectOptions = response.data
     },
-    async getExecuteRecoding(cid) {
-      this.$router.push("/case/executeRecoding/" + cid);
+    async getExecuteRecoding (cid) {
+      this.$router.push('/case/executeRecoding/' + cid)
     }
   },
-  created() {
-        if (
-      window.sessionStorage.getItem("projectId") != null &&
-      window.sessionStorage.getItem("projectName") != null
+  created () {
+    if (
+      window.sessionStorage.getItem('projectId') != null &&
+      window.sessionStorage.getItem('projectName') != null
     ) {
-      this.$global.currentProjectId = window.sessionStorage.getItem("projectId");
-      this.$global.currentProjectName = window.sessionStorage.getItem("projectName");
-      this.queryComponentListParams.projectId = this.$global.currentProjectId;
+      this.$global.currentProjectId = window.sessionStorage.getItem('projectId')
+      this.$global.currentProjectName = window.sessionStorage.getItem('projectName')
+      this.queryComponentListParams.projectId = this.$global.currentProjectId
     }
 
-    this.getComponentList();
-    this.getComponentCategory();
+    this.getComponentList()
+    this.getComponentCategory()
   }
-};
+}
 </script>
 <style lang="less" scoped></style>

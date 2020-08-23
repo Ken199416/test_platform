@@ -38,54 +38,54 @@
 </template>
 <script>
 export default {
-  data() {
+  data () {
     return {
       projectList: []
-    };
-  },
-  methods: {
-    async getAllProject() {
-      const data = await this.$common.getAllProject();
-      this.projectList = data;
-    },
-    changeProject(id, name) {
-      this.$confirm(
-        "是否切换到 [ " + name + " ] ？ 切换之后只显示当前项目的相关内容 ！",
-        "提示",
-        {
-          confirmButtonText: "确定",
-          cancelButtonText: "取消",
-          type: "warning"
-        }
-      )
-        .then(() => {
-          window.sessionStorage.setItem("projectId", id);
-          window.sessionStorage.setItem("projectName", name);
-          location.reload();
-        })
-        .catch(() => {});
-    },
-    delProject() {
-      this.$confirm(
-        "是否切换到 [ 全平台 ] ？ 切换之后显示全部内容 ！",
-        "提示",
-        {
-          confirmButtonText: "确定",
-          cancelButtonText: "取消",
-          type: "warning"
-        }
-      )
-        .then(() => {
-          window.sessionStorage.removeItem("projectId");
-          window.sessionStorage.removeItem("projectName");
-          location.reload();
-        })
-        .catch(() => {});
     }
   },
-  created() {
-    this.getAllProject();
+  methods: {
+    async getAllProject () {
+      const data = await this.$common.getAllProject()
+      this.projectList = data
+    },
+    changeProject (id, name) {
+      this.$confirm(
+        '是否切换到 [ ' + name + ' ] ？ 切换之后只显示当前项目的相关内容 ！',
+        '提示',
+        {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }
+      )
+        .then(() => {
+          window.sessionStorage.setItem('projectId', id)
+          window.sessionStorage.setItem('projectName', name)
+          location.reload()
+        })
+        .catch(() => {})
+    },
+    delProject () {
+      this.$confirm(
+        '是否切换到 [ 全平台 ] ？ 切换之后显示全部内容 ！',
+        '提示',
+        {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }
+      )
+        .then(() => {
+          window.sessionStorage.removeItem('projectId')
+          window.sessionStorage.removeItem('projectName')
+          location.reload()
+        })
+        .catch(() => {})
+    }
+  },
+  created () {
+    this.getAllProject()
   }
-};
+}
 </script>
 <style lang="less" scoped></style>
