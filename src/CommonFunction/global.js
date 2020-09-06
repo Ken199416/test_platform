@@ -1,7 +1,7 @@
 const currentProjectId = null
-const currentProjectName = null;
+const currentProjectName = null
 
-export default{
+export default {
   currentProjectId,
   currentProjectName
 }

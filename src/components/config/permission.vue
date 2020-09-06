@@ -77,29 +77,29 @@
 </template>
 <script>
 export default {
-  data() {
+  data () {
     //   验证邮箱
     var checkEmail = (rule, value, callback) => {
       // 验证邮箱的正则
-      const regEmail = /^([a-zA-Z0-9_-])+@([a-zA-Z0-9_-])+(.[a-zA-Z0-9_-])+/;
+      const regEmail = /^([a-zA-Z0-9_-])+@([a-zA-Z0-9_-])+(.[a-zA-Z0-9_-])+/
       if (regEmail.test(value)) {
-        return callback();
+        return callback()
       }
-      callback(new Error("请输入合法的邮箱"));
-    };
+      callback(new Error('请输入合法的邮箱'))
+    }
     //    验证手机号
     var checkMobile = (rule, value, callback) => {
       // 验证手机号的正则
-      const regMobile = /^1([38][0-9]|4[579]|5[0-3,5-9]|6[6]|7[0135678]|9[89])\d{8}$/;
+      const regMobile = /^1([38][0-9]|4[579]|5[0-3,5-9]|6[6]|7[0135678]|9[89])\d{8}$/
       if (regMobile.test(value)) {
-        return callback();
+        return callback()
       }
-      callback(new Error("请输入正确的手机号"));
-    };
+      callback(new Error('请输入正确的手机号'))
+    }
     return {
       // 获取权限列表
       queryPermissionListParams: {
-        query: "",
+        query: '',
         pageNum: 1,
         pageSize: 10
       },
@@ -110,26 +110,26 @@ export default {
       permissionList: [
         {
           id: 1,
-          name: "权限名测试数据1",
-          url: "test/test1",
+          name: '权限名测试数据1',
+          url: 'test/test1',
           leave: 0,
-          userGroup: "测试用户组1",
+          userGroup: '测试用户组1',
           del: true
         },
         {
           id: 2,
-          name: "权限名测试数据2",
-          url: "test/test2",
+          name: '权限名测试数据2',
+          url: 'test/test2',
           leave: 1,
-          userGroup: "测试用户组2",
+          userGroup: '测试用户组2',
           del: true
         },
         {
           id: 3,
-          name: "权限名测试数据3",
-          url: "test/test3",
+          name: '权限名测试数据3',
+          url: 'test/test3',
           leave: 2,
-          userGroup: "测试用户组3",
+          userGroup: '测试用户组3',
           del: true
         }
       ],
@@ -139,82 +139,82 @@ export default {
       //   添加用户表单规则
       addForm: {
         id: 0,
-        username: "",
-        password: "",
-        mobile: "",
-        email: "",
-        address: "",
-        company: "",
-        department: "",
-        customerName: ""
+        username: '',
+        password: '',
+        mobile: '',
+        email: '',
+        address: '',
+        company: '',
+        department: '',
+        customerName: ''
       },
       //   修改用户信息
       editForm: {
-        username: "",
-        mobile: "",
-        email: "",
-        address: "",
-        company: "",
-        department: "",
-        customerName: ""
+        username: '',
+        mobile: '',
+        email: '',
+        address: '',
+        company: '',
+        department: '',
+        customerName: ''
       },
       //   添加表单验证规则的对象
       addFormRules: {
         username: [
-          { required: true, message: "请输入您的用户名", trigger: "blur" },
-          { min: 2, max: 20, message: "长度在 2 到 20 个字符", trigger: "blur" }
+          { required: true, message: '请输入您的用户名', trigger: 'blur' },
+          { min: 2, max: 20, message: '长度在 2 到 20 个字符', trigger: 'blur' }
         ],
         password: [
-          { required: true, message: "请输入您的密码", trigger: "blur" },
-          { min: 4, max: 20, message: "长度在 4 到 20 个字符", trigger: "blur" }
+          { required: true, message: '请输入您的密码', trigger: 'blur' },
+          { min: 4, max: 20, message: '长度在 4 到 20 个字符', trigger: 'blur' }
         ],
         mobile: [
           // { min: 1, max: 12, message: '长度应为11位', trigger: 'blur' },
-          { required: true, message: "请输入您的手机号", trigger: "blur" },
+          { required: true, message: '请输入您的手机号', trigger: 'blur' },
           // { type: 'number', message: '请输入11位手机号（数值类型）', trigger: 'blur' },
-          { validator: checkMobile, trigger: "blur" }
+          { validator: checkMobile, trigger: 'blur' }
         ],
         email: [
-          { required: true, message: "请输入您的手机号", trigger: "blur" },
-          { validator: checkEmail, trigger: "blur" }
+          { required: true, message: '请输入您的手机号', trigger: 'blur' },
+          { validator: checkEmail, trigger: 'blur' }
         ],
         address: [
           {
             min: 2,
             max: 100,
-            message: "长度在 2 到 10 个字符",
-            trigger: "blur"
+            message: '长度在 2 到 10 个字符',
+            trigger: 'blur'
           }
         ],
         company: [
-          { min: 2, max: 40, message: "长度在 2 到 40 个字符", trigger: "blur" }
+          { min: 2, max: 40, message: '长度在 2 到 40 个字符', trigger: 'blur' }
         ],
         department: [
-          { min: 2, max: 20, message: "长度在 2 到 20 个字符", trigger: "blur" }
+          { min: 2, max: 20, message: '长度在 2 到 20 个字符', trigger: 'blur' }
         ],
         customerName: [
-          { required: true, message: "请输入您的昵称", trigger: "blur" },
-          { min: 2, max: 20, message: "长度在 2 到 20 个字符", trigger: "blur" }
+          { required: true, message: '请输入您的昵称', trigger: 'blur' },
+          { min: 2, max: 20, message: '长度在 2 到 20 个字符', trigger: 'blur' }
         ]
       },
       editDialogVisible: false
-    };
+    }
   },
   methods: {
-    async getPermissionList() {
-      const { data: response } = await this.$http.get("/queryPermission", {
+    async getPermissionList () {
+      const { data: response } = await this.$http.get('/queryPermission', {
         params: this.queryPermissionListParams
-      });
+      })
       if (response.code != 10000) {
-        this.$message.error("服务器开小差了，请稍后重试或者联系管理员！");
+        this.$message.error('服务器开小差了，请稍后重试或者联系管理员！')
       } else {
-        this.userList = response.data;
-        this.userTotal = response.total;
+        this.userList = response.data
+        this.userTotal = response.total
         // console.log(this.userTotal);
         // console.log(this.userList);
       }
     },
-    async delUser(row) {
+    async delUser (row) {
       //   this.delUserParam.uid = row.id;
       //   this.delUserParam.flag = row.del;
       //   const { data: response } = await this.$http.get("/toDelUser", {
@@ -225,142 +225,142 @@ export default {
       //   }
       if (!row.del) {
         this.$message({
-          type: "success",
-          message: "该权限已停用!"
-        });
+          type: 'success',
+          message: '该权限已停用!'
+        })
       } else {
         this.$message({
-          type: "success",
-          message: "该权限已恢复使用!"
-        });
+          type: 'success',
+          message: '该权限已恢复使用!'
+        })
       }
       //   this.getUserList();
     },
     // handleClick(row) {
     //   console.log(row);
     // },
-    async changeDel(row) {
+    async changeDel (row) {
       // 停用权限
       if (!row.del) {
-        await this.$confirm("是否停用该权限?", "提示", {
-          confirmButtonText: "停用",
-          cancelButtonText: "取消",
-          type: "warning"
+        await this.$confirm('是否停用该权限?', '提示', {
+          confirmButtonText: '停用',
+          cancelButtonText: '取消',
+          type: 'warning'
         })
           .then(() => {
-            this.delUser(row);
-            console.log("删除了");
+            this.delUser(row)
+            console.log('删除了')
           })
           .catch(() => {
-            row.del = !row.del;
+            row.del = !row.del
             this.$message({
-              type: "info",
-              message: "已取消停用"
-            });
-          });
+              type: 'info',
+              message: '已取消停用'
+            })
+          })
       } else {
-        await this.$confirm("是否恢复该用户?", "提示", {
-          confirmButtonText: "恢复",
-          cancelButtonText: "取消",
-          type: "warning"
+        await this.$confirm('是否恢复该用户?', '提示', {
+          confirmButtonText: '恢复',
+          cancelButtonText: '取消',
+          type: 'warning'
         })
           .then(() => {
-            this.delUser(row);
+            this.delUser(row)
           })
           .catch(() => {
-            row.del = !row.del;
+            row.del = !row.del
             this.$message({
-              type: "info",
-              message: "已取消恢复"
-            });
-          });
+              type: 'info',
+              message: '已取消恢复'
+            })
+          })
       }
     },
     // 监听每页显示数的改变
-    handleSizeChange(newSize) {
-      this.queryUserListParams.pageSize = newSize;
-      this.getUserList();
+    handleSizeChange (newSize) {
+      this.queryUserListParams.pageSize = newSize
+      this.getUserList()
       // console.log(newSize);
     },
     // 监听页码的改变
-    handleCurrentChange(newPage) {
-      this.queryUserListParams.pageNum = newPage;
-      this.getUserList();
+    handleCurrentChange (newPage) {
+      this.queryUserListParams.pageNum = newPage
+      this.getUserList()
       // console.log(newPage);
     },
     // 监听添加用户框关闭后的清除操作
-    closeAdd() {
-      this.$refs.addFormRef.resetFields();
+    closeAdd () {
+      this.$refs.addFormRef.resetFields()
     },
     // 发送添加用户的请求
-    async addUser() {
+    async addUser () {
       this.$refs.addFormRef.validate(async valid => {
         if (valid) {
           const { data: response } = await this.$http.post(
-            "/addUser",
+            '/addUser',
             this.addForm
-          );
+          )
           if (response.code == 10000) {
-            this.$message.success(response.msg);
-            this.addDialogVisible = false;
-            this.getUserList();
+            this.$message.success(response.msg)
+            this.addDialogVisible = false
+            this.getUserList()
           } else {
-            this.$message.error(response.msg);
+            this.$message.error(response.msg)
           }
         } else {
         }
-      });
+      })
     },
-    showDialogVisible(user) {
+    showDialogVisible (user) {
       // console.log(user);
-      this.editForm = user;
-      this.editDialogVisible = true;
+      this.editForm = user
+      this.editDialogVisible = true
     },
     // 发送修改用户的请求
-    async editUser() {
+    async editUser () {
       // console.log(this.editForm);
       this.$refs.editFormRef.validate(async valid => {
         if (valid) {
           const { data: response } = await this.$http.post(
-            "/editUser",
+            '/editUser',
             this.editForm
-          );
+          )
           if (response.code == 10000) {
-            this.$message.success(response.msg);
-            this.editDialogVisible = false;
-            this.getUserList();
+            this.$message.success(response.msg)
+            this.editDialogVisible = false
+            this.getUserList()
           } else {
-            this.$message.error(response.msg);
+            this.$message.error(response.msg)
           }
         } else {
         }
-      });
+      })
     },
-    closeEdit() {
-      this.$refs.editFormRef.resetFields();
+    closeEdit () {
+      this.$refs.editFormRef.resetFields()
     },
-    getUserInfo(uid) {
-      console.log("查看详情");
-      this.$alert("用户详情优化功能正在路上，敬请期待...", "工程师开发中...", {
-        confirmButtonText: "确定",
+    getUserInfo (uid) {
+      console.log('查看详情')
+      this.$alert('用户详情优化功能正在路上，敬请期待...', '工程师开发中...', {
+        confirmButtonText: '确定',
         callback: action => {
           // 点击确定回调
         }
-      });
-      //尚未开发，开发后会跳转到以下页面
+      })
+      // 尚未开发，开发后会跳转到以下页面
       // console.log("uid："+uid);
       // this.$router.push('/config/user/userInfo/'+uid);
     },
-    noDo() {
-      this.$alert("用户权限功能正在路上，敬请期待...", "工程师开发中...", {
-        confirmButtonText: "确定",
+    noDo () {
+      this.$alert('用户权限功能正在路上，敬请期待...', '工程师开发中...', {
+        confirmButtonText: '确定',
         callback: action => {
           // 点击确定回调
         }
-      });
+      })
     }
   },
-  created() {
+  created () {
     // this.getPermissionList();
     // this.$alert("后端功能开发中，此页面数据仅供效果预览，请知晓！！！", "权限页面说明", {
     //     confirmButtonText: "确定",
@@ -368,7 +368,7 @@ export default {
     //       // 点击确定回调
     //     }
     //   });
-  }    
+  }
 }
 </script>
 <style lang="stylus" scoped></style>

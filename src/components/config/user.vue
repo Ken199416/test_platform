@@ -94,7 +94,7 @@
         layout="total, sizes, prev, pager, next, jumper"
         :total="userTotal"
       ></el-pagination>
-      
+
     </el-card>
 
     <!-- 添加用户的对话框 -->
@@ -265,34 +265,34 @@
       </span>
     </el-dialog>
     <router-view></router-view>
-    
+
   </div>
 </template>
 <script>
 export default {
-  data() {
+  data () {
     //   验证邮箱
     var checkEmail = (rule, value, callback) => {
       // 验证邮箱的正则
-      const regEmail = /^([a-zA-Z0-9_-])+@([a-zA-Z0-9_-])+(.[a-zA-Z0-9_-])+/;
+      const regEmail = /^([a-zA-Z0-9_-])+@([a-zA-Z0-9_-])+(.[a-zA-Z0-9_-])+/
       if (regEmail.test(value)) {
-        return callback();
+        return callback()
       }
-      callback(new Error("请输入合法的邮箱"));
-    };
+      callback(new Error('请输入合法的邮箱'))
+    }
     //    验证手机号
     var checkMobile = (rule, value, callback) => {
       // 验证手机号的正则
-      const regMobile = /^1([38][0-9]|4[579]|5[0-3,5-9]|6[6]|7[0135678]|9[89])\d{8}$/;
+      const regMobile = /^1([38][0-9]|4[579]|5[0-3,5-9]|6[6]|7[0135678]|9[89])\d{8}$/
       if (regMobile.test(value)) {
-        return callback();
+        return callback()
       }
-      callback(new Error("请输入正确的手机号"));
-    };
+      callback(new Error('请输入正确的手机号'))
+    }
     return {
       // 获取用户列表请求参数
       queryUserListParams: {
-        query: "",
+        query: '',
         pageNum: 1,
         pageSize: 10
       },
@@ -309,224 +309,224 @@ export default {
       //   添加用户表单参数
       addForm: {
         id: 0,
-        username: "",
-        password: "",
-        mobile: "",
-        email: "",
-        address: "",
-        company: "",
-        department: "",
-        customerName: ""
+        username: '',
+        password: '',
+        mobile: '',
+        email: '',
+        address: '',
+        company: '',
+        department: '',
+        customerName: ''
       },
       //   修改用户信息表单参数
       editForm: {
-        username: "",
-        mobile: "",
-        email: "",
-        address: "",
-        company: "",
-        department: "",
-        customerName: ""
+        username: '',
+        mobile: '',
+        email: '',
+        address: '',
+        company: '',
+        department: '',
+        customerName: ''
       },
       //   添加表单验证规则的对象
       addFormRules: {
         username: [
-          { required: true, message: "请输入您的用户名", trigger: "blur" },
-          { min: 2, max: 20, message: "长度在 2 到 20 个字符", trigger: "blur" }
+          { required: true, message: '请输入您的用户名', trigger: 'blur' },
+          { min: 2, max: 20, message: '长度在 2 到 20 个字符', trigger: 'blur' }
         ],
         password: [
-          { required: true, message: "请输入您的密码", trigger: "blur" },
-          { min: 4, max: 20, message: "长度在 4 到 20 个字符", trigger: "blur" }
+          { required: true, message: '请输入您的密码', trigger: 'blur' },
+          { min: 4, max: 20, message: '长度在 4 到 20 个字符', trigger: 'blur' }
         ],
         mobile: [
           // { min: 1, max: 12, message: '长度应为11位', trigger: 'blur' },
-          { required: true, message: "请输入您的手机号", trigger: "blur" },
+          { required: true, message: '请输入您的手机号', trigger: 'blur' },
           // { type: 'number', message: '请输入11位手机号（数值类型）', trigger: 'blur' },
-          { validator: checkMobile, trigger: "blur" }
+          { validator: checkMobile, trigger: 'blur' }
         ],
         email: [
-          { required: true, message: "请输入您的邮箱地址", trigger: "blur" },
-          { validator: checkEmail, trigger: "blur" }
+          { required: true, message: '请输入您的邮箱地址', trigger: 'blur' },
+          { validator: checkEmail, trigger: 'blur' }
         ],
         address: [
           {
             min: 2,
             max: 100,
-            message: "长度在 2 到 10 个字符",
-            trigger: "blur"
+            message: '长度在 2 到 10 个字符',
+            trigger: 'blur'
           }
         ],
         company: [
-          { min: 2, max: 40, message: "长度在 2 到 40 个字符", trigger: "blur" }
+          { min: 2, max: 40, message: '长度在 2 到 40 个字符', trigger: 'blur' }
         ],
         department: [
-          { min: 2, max: 20, message: "长度在 2 到 20 个字符", trigger: "blur" }
+          { min: 2, max: 20, message: '长度在 2 到 20 个字符', trigger: 'blur' }
         ],
         customerName: [
-          { required: true, message: "请输入您的昵称", trigger: "blur" },
-          { min: 2, max: 20, message: "长度在 2 到 20 个字符", trigger: "blur" }
+          { required: true, message: '请输入您的昵称', trigger: 'blur' },
+          { min: 2, max: 20, message: '长度在 2 到 20 个字符', trigger: 'blur' }
         ]
       },
       editDialogVisible: false
-    };
+    }
   },
   methods: {
     // 查询用户列表
-    async getUserList() {
-      const { data: response } = await this.$http.get("/queryUser", {
+    async getUserList () {
+      const { data: response } = await this.$http.get('/queryUser', {
         params: this.queryUserListParams
-      });
+      })
       if (response.code != 10000) {
-        this.$message.error("服务器开小差了，请稍后重试或者联系管理员！");
+        this.$message.error(response.msg)
       } else {
-        this.userList = response.data;
-        this.userTotal = response.total;
+        this.userList = response.data
+        this.userTotal = this.userList.length
         // console.log(this.userTotal);
         // console.log(this.userList);
       }
     },
     // 停用用户
-    async delUser(row) {
-      this.delUserParam.uid = row.id;
-      this.delUserParam.flag = row.del;
-      const { data: response } = await this.$http.get("/toDelUser", {
+    async delUser (row) {
+      this.delUserParam.uid = row.id
+      this.delUserParam.flag = row.del
+      const { data: response } = await this.$http.get('/toDelUser', {
         params: this.delUserParam
-      });
+      })
       if (response.code != 10000) {
-        this.$message.error("服务器开小差了，请稍后重试或者联系管理员！");
+        this.$message.error('服务器开小差了，请稍后重试或者联系管理员！')
       }
       if (!row.del) {
         this.$message({
-          type: "success",
-          message: "该账户已停用!"
-        });
+          type: 'success',
+          message: '该账户已停用!'
+        })
       } else {
         this.$message({
-          type: "success",
-          message: "该账户已恢复使用!"
-        });
+          type: 'success',
+          message: '该账户已恢复使用!'
+        })
       }
-      this.getUserList();
+      this.getUserList()
     },
     // 改变用户状态
-    async changeDel(row) {
+    async changeDel (row) {
       // 停用用户操作
       if (!row.del) {
-        await this.$confirm("是否停用该用户?", "提示", {
-          confirmButtonText: "停用",
-          cancelButtonText: "取消",
-          type: "warning"
+        await this.$confirm('是否停用该用户?', '提示', {
+          confirmButtonText: '停用',
+          cancelButtonText: '取消',
+          type: 'warning'
         })
           .then(() => {
-            this.delUser(row);
-            console.log("删除了");
+            this.delUser(row)
+            console.log('删除了')
           })
           .catch(() => {
-            this.getUserList();
+            this.getUserList()
             this.$message({
-              type: "info",
-              message: "已取消停用"
-            });
-          });
+              type: 'info',
+              message: '已取消停用'
+            })
+          })
       } else {
-        await this.$confirm("是否恢复该用户?", "提示", {
-          confirmButtonText: "恢复",
-          cancelButtonText: "取消",
-          type: "warning"
+        await this.$confirm('是否恢复该用户?', '提示', {
+          confirmButtonText: '恢复',
+          cancelButtonText: '取消',
+          type: 'warning'
         })
           .then(() => {
-            this.delUser(row);
-            console.log("删除了");
+            this.delUser(row)
+            console.log('删除了')
           })
           .catch(() => {
-            this.getUserList();
+            this.getUserList()
             this.$message({
-              type: "info",
-              message: "已取消恢复"
-            });
-          });
+              type: 'info',
+              message: '已取消恢复'
+            })
+          })
       }
     },
     // 监听每页显示数的改变
-    handleSizeChange(newSize) {
-      this.queryUserListParams.pageSize = newSize;
-      this.getUserList();
+    handleSizeChange (newSize) {
+      this.queryUserListParams.pageSize = newSize
+      this.getUserList()
       // console.log(newSize);
     },
     // 监听页码的改变
-    handleCurrentChange(newPage) {
-      this.queryUserListParams.pageNum = newPage;
-      this.getUserList();
+    handleCurrentChange (newPage) {
+      this.queryUserListParams.pageNum = newPage
+      this.getUserList()
       // console.log(newPage);
     },
     // 监听添加用户框关闭后的清除操作
-    closeAdd() {
-      this.$refs.addFormRef.resetFields();
+    closeAdd () {
+      this.$refs.addFormRef.resetFields()
     },
     // 发送添加用户的请求
-    async addUser() {
+    async addUser () {
       this.$refs.addFormRef.validate(async valid => {
         if (valid) {
           const { data: response } = await this.$http.post(
-            "/addUser",
+            '/addUser',
             this.addForm
-          );
+          )
           if (response.code == 10000) {
-            this.$message.success(response.msg);
-            this.addDialogVisible = false;
-            this.getUserList();
+            this.$message.success(response.msg)
+            this.addDialogVisible = false
+            this.getUserList()
           } else {
-            this.$message.error(response.msg);
+            this.$message.error(response.msg)
           }
         } else {
         }
-      });
+      })
     },
     // 打开修改用户弹窗，之后需要优化成先调用后端再赋值的逻辑
-    showDialogVisible(user) {
-      this.editForm = user;
-      this.editDialogVisible = true;
+    showDialogVisible (user) {
+      this.editForm = user
+      this.editDialogVisible = true
     },
     // 发送修改用户的请求
-    async editUser() {
+    async editUser () {
       this.$refs.editFormRef.validate(async valid => {
         if (valid) {
           const { data: response } = await this.$http.post(
-            "/editUser",
+            '/editUser',
             this.editForm
-          );
+          )
           if (response.code == 10000) {
-            this.$message.success(response.msg);
-            this.editDialogVisible = false;
-            this.getUserList();
+            this.$message.success(response.msg)
+            this.editDialogVisible = false
+            this.getUserList()
           } else {
-            this.$message.error(response.msg);
+            this.$message.error(response.msg)
           }
         } else {
         }
-      });
+      })
     },
     // 关闭用户修改用户弹窗触发的操作
-    closeEdit() {
-      this.$refs.editFormRef.resetFields();
+    closeEdit () {
+      this.$refs.editFormRef.resetFields()
     },
     // 查看用户详情
-    getUserInfo(uid) {
-      console.log("查看详情");
-      this.$alert("用户详情优化功能正在路上，敬请期待...", "工程师开发中...", {
-        confirmButtonText: "确定",
+    getUserInfo (uid) {
+      console.log('查看详情')
+      this.$alert('用户详情优化功能正在路上，敬请期待...', '工程师开发中...', {
+        confirmButtonText: '确定',
         callback: action => {
           // 点击确定回调
         }
-      });
-      //尚未开发，开发后会跳转到以下页面
+      })
+      // 尚未开发，开发后会跳转到以下页面
       // console.log("uid："+uid);
       // this.$router.push('/config/user/userInfo/'+uid);
     }
   },
-  created() {
-    this.getUserList();
+  created () {
+    this.getUserList()
   }
-};
+}
 </script>
 <style lang="stylus" scoped></style>

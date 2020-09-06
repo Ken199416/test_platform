@@ -76,12 +76,30 @@
               <span :key="index" v-for="(item,index) in scope.row.assertContent.split('<==>')">{{item}}<br/></span>
           </template>
         </el-table-column>
-        <el-table-column prop="executeResponse" label="接口响应" width="300"></el-table-column>
+        <el-table-column prop="executeResponse" label="接口响应" width="300">
+
+          <template slot-scope="scope">
+            <span>
+            {{scope.row.executeResponse.length > 100 ? scope.row.executeResponse.substring(0,100) + '......' : scope.row.executeResponse}}
+            </span>
+             <el-button v-if="scope.row.executeResponse.length > 100" type="primary" size="mini" @click='queryExecuteResponse(scope.row)'>查看更多</el-button>
+          </template>
+        </el-table-column>
 
         <el-table-column prop="username" label="执行人" width="95"></el-table-column>
 
-        
       </el-table>
+
+      <!-- 查看更多的响应信息dialog -->
+      <el-dialog
+  title="Response"
+  :visible.sync="executeResponseDialog"
+  width="90%">
+  <el-input type="textarea" rows='23' v-model="allExecuteResponse"></el-input>
+  <span slot="footer" class="dialog-footer">
+    <el-button type="primary" @click="executeResponseDialog = false">朕知道了</el-button>
+  </span>
+</el-dialog>
 
       <!-- 分页区域 -->
       <el-pagination
@@ -98,68 +116,74 @@
 </template>
 <script>
 export default {
-  props: ["cid"],
-  data() {
+  props: ['cid'],
+  data () {
     return {
       recoding: [],
       queryExecuteRecoding: {
         cid: 0,
         pageNum: 1,
         pageSize: 10,
-        startTime:'',
-        endTime:''
+        startTime: '',
+        endTime: ''
       },
       recodingTotal: 10,
       executeResult: -1,
       executeResults: [
         {
           value: 1,
-          label: "执行成功"
+          label: '执行成功'
         },
         {
           value: 0,
-          label: "执行失败"
+          label: '执行失败'
         }
       ],
-      time: []
-    };
-  },
-  methods: {
-    black(){
-      this.$router.push('/case/single');
-    },
-    // 监听每页显示数的改变
-    handleSizeChange(newSize) {
-      this.queryExecuteRecoding.pageSize = newSize;
-      this.getRecoding();
-    },
-    // 监听页码的改变
-    handleCurrentChange(newPage) {
-      this.queryExecuteRecoding.pageNum = newPage;
-      this.getRecoding();
-    },
-    async getRecoding() {
-      this.queryExecuteRecoding.cid = parseInt(this.cid);
-      const { data: response } = await this.$http.get("/getExecuteRecoding", {
-        params: this.queryExecuteRecoding
-      });
-      this.recoding = response.data;
-      this.recodingTotal = response.total;
-    },
-    query(){
-      if(this.time != null &&  this.time[0] !== undefined){
-        this.queryExecuteRecoding.startTime = this.time[0];
-        this.queryExecuteRecoding.endTime = this.time[1];
-      }else{
-        this.queryExecuteRecoding.startTime = '';
-        this.queryExecuteRecoding.endTime = '';
-      }
-      this.getRecoding();
+      time: [],
+      executeResponseDialog: false,
+      allExecuteResponse: ''
     }
   },
-  created() {
-    this.getRecoding();
+  methods: {
+    black () {
+      this.$router.push('/case/single')
+    },
+    // 监听每页显示数的改变
+    handleSizeChange (newSize) {
+      this.queryExecuteRecoding.pageSize = newSize
+      this.getRecoding()
+    },
+    // 监听页码的改变
+    handleCurrentChange (newPage) {
+      this.queryExecuteRecoding.pageNum = newPage
+      this.getRecoding()
+    },
+    async getRecoding () {
+      this.queryExecuteRecoding.cid = parseInt(this.cid)
+      const { data: response } = await this.$http.get('/getExecuteRecoding', {
+        params: this.queryExecuteRecoding
+      })
+      this.recoding = response.data
+      this.recodingTotal = response.total
+    },
+    query () {
+      if (this.time != null && this.time[0] !== undefined) {
+        this.queryExecuteRecoding.startTime = this.time[0]
+        this.queryExecuteRecoding.endTime = this.time[1]
+      } else {
+        this.queryExecuteRecoding.startTime = ''
+        this.queryExecuteRecoding.endTime = ''
+      }
+      this.getRecoding()
+    },
+    queryExecuteResponse (row) {
+      this.allExecuteResponse = this.$common.formatJson(row.executeResponse)
+      this.executeResponseDialog = true
+    }
+  },
+  created () {
+    this.getRecoding()
   }
-};
+}
 </script>
 <style lang="less" scoped></style>

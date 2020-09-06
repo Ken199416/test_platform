@@ -59,7 +59,7 @@
 
       <!-- 列表区域 -->
       <el-table :data="caseList" border height="650" style="width: 100%">
-        <el-table-column fixed type="index" label="#" width="50px"></el-table-column>
+        <el-table-column fixed type="index" label="#" width="40px"></el-table-column>
         <el-table-column prop="name" label="用例名称" width="190">
           <template slot-scope="scope">
             <el-popover placement="right" width="400px" trigger="hover">
@@ -102,9 +102,9 @@
             </span>
           </template>
         </el-table-column>
-        <el-table-column prop="preCaseGroup" label="前置用例集" width="200"></el-table-column>
+        <el-table-column prop="preCaseGroup" label="前置用例集" min-width="250"></el-table-column>
         <!-- 状态按钮 -->
-        <el-table-column fixed="right" label="状态" width="70">
+        <el-table-column fixed="right"  label="状态" width="70">
           <template slot-scope="scope">
             <el-tooltip
               v-if="scope.row.del"
@@ -137,7 +137,7 @@
           </template>
         </el-table-column>
         <!-- 操作列 -->
-        <el-table-column fixed="right" label="操作" width="240">
+        <el-table-column fixed="right"  label="操作" width="240">
           <template slot-scope="scope">
             <el-button
               v-if="scope.row.del"
@@ -186,7 +186,7 @@
   >
   <el-form  label-width="80px" :model="caseResult">
   <el-form-item label="响应结果">
-    <el-input contenteditable="true" type="textarea"  v-model="caseResult.responseStr"></el-input>
+    <el-input contenteditable="true" type="textarea"  rows=20 v-model="caseResult.responseStr"></el-input>
   </el-form-item>
   <el-form-item label="断言结果">
     <el-table
@@ -240,7 +240,7 @@
 </template>
 <script>
 export default {
-  data() {
+  data () {
     return {
       drawer: false,
       // 调用接口加载的图层打开标志位
@@ -253,11 +253,11 @@ export default {
       projectOptions: [],
       // 获取用例列表参数
       queryCaseListParams: {
-        query: "",
+        query: '',
         pageNum: 1,
         pageSize: 10,
-        protocolId: "",
-        projectId: ""
+        protocolId: '',
+        projectId: ''
       },
       // 停用用例列表参数
       delCaseParam: {
@@ -270,177 +270,177 @@ export default {
       caseCount: 0,
       caseGroupList: {},
       queryForm: {
-        query: "",
+        query: '',
         pageNum: 1,
         pageSize: 50
       },
-      currentProjectId: "",
-      currentProjectName: "",
-      executeResponseDialog:false,
-      caseResult:{}
-    };
+      currentProjectId: '',
+      currentProjectName: '',
+      executeResponseDialog: false,
+      caseResult: {}
+    }
   },
   methods: {
-    toEditCaseAction(row) {
-      this.$router.push("/case/single/action/" + row.id);
+    toEditCaseAction (row) {
+      this.$router.push('/case/single/action/' + row.id)
     },
-    toAddCaseAction() {
+    toAddCaseAction () {
       //  前往添加用例路由
-      this.$router.push("/case/single/action/add");
+      this.$router.push('/case/single/action/add')
     },
     // 获取全部用例，请求之前重置请求
-    getCaseListBySelect() {
-      this.queryCaseListParams.pageNum = 1;
+    getCaseListBySelect () {
+      this.queryCaseListParams.pageNum = 1
       // this.queryCaseListParams.pageSize = 10;
-      this.getCaseList();
+      this.getCaseList()
     },
     // 获取用例列表
-    async getCaseList() {
-      const { data: response } = await this.$http.get("/getAllCase", {
+    async getCaseList () {
+      const { data: response } = await this.$http.get('/getAllCase', {
         params: this.queryCaseListParams
-      });
+      })
       if (response.code != 10000) {
-        this.caseList = response.data;
-        this.$message.error(response.msg);
+        this.caseList = response.data
+        this.$message.error(response.msg)
       } else {
-        this.caseList = response.data;
-        this.caseCount = response.caseCount;
+        this.caseList = response.data
+        this.caseCount = response.caseCount
       }
     },
     // 停用用例
-    async delCase(row) {
-      this.delCaseParam.cid = row.id;
-      this.delCaseParam.flag = row.del;
-      const { data: response } = await this.$http.get("/toDelCase", {
+    async delCase (row) {
+      this.delCaseParam.cid = row.id
+      this.delCaseParam.flag = row.del
+      const { data: response } = await this.$http.get('/toDelCase', {
         params: this.delCaseParam
-      });
+      })
       if (response.code != 10000) {
-        this.$message.error("服务器开小差了，请稍后重试或者联系管理员！");
+        this.$message.error('服务器开小差了，请稍后重试或者联系管理员！')
       }
       if (!row.del) {
         this.$message({
-          type: "success",
-          message: "该用例已停用!"
-        });
+          type: 'success',
+          message: '该用例已停用!'
+        })
       } else {
         this.$message({
-          type: "success",
-          message: "该用例已恢复使用!"
-        });
+          type: 'success',
+          message: '该用例已恢复使用!'
+        })
       }
-      this.getCaseList();
+      this.getCaseList()
     },
     // 改变用例状态
-    async changeDel(row) {
+    async changeDel (row) {
       // 停用
       if (!row.del) {
-        await this.$confirm("是否停用该用例?", "提示", {
-          confirmButtonText: "停用",
-          cancelButtonText: "取消",
-          type: "warning"
+        await this.$confirm('是否停用该用例?', '提示', {
+          confirmButtonText: '停用',
+          cancelButtonText: '取消',
+          type: 'warning'
         })
           .then(() => {
-            this.delCase(row);
+            this.delCase(row)
           })
           .catch(() => {
-            this.getCaseList();
+            this.getCaseList()
             this.$message({
-              type: "info",
-              message: "已取消停用"
-            });
-          });
+              type: 'info',
+              message: '已取消停用'
+            })
+          })
       } else {
-        await this.$confirm("是否恢复使用该用例?", "提示", {
-          confirmButtonText: "恢复",
-          cancelButtonText: "取消",
-          type: "warning"
+        await this.$confirm('是否恢复使用该用例?', '提示', {
+          confirmButtonText: '恢复',
+          cancelButtonText: '取消',
+          type: 'warning'
         })
           .then(() => {
-            this.delCase(row);
+            this.delCase(row)
             // console.log("删除了");
           })
           .catch(() => {
-            this.getCaseList();
+            this.getCaseList()
             this.$message({
-              type: "info",
-              message: "已取消恢复使用"
-            });
-          });
+              type: 'info',
+              message: '已取消恢复使用'
+            })
+          })
       }
     },
     // 监听每页显示数的改变
-    handleSizeChange(newSize) {
-      this.queryCaseListParams.pageSize = newSize;
-      this.getCaseList();
+    handleSizeChange (newSize) {
+      this.queryCaseListParams.pageSize = newSize
+      this.getCaseList()
       // console.log(newSize);
     },
     // 监听页码的改变
-    handleCurrentChange(newPage) {
-      this.queryCaseListParams.pageNum = newPage;
-      this.getCaseList();
+    handleCurrentChange (newPage) {
+      this.queryCaseListParams.pageNum = newPage
+      this.getCaseList()
       // console.log(newPage);
     },
     // 监听添加用户框关闭后的清除操作
-    closeAdd() {
-      this.$refs.addCaseFormRef.resetFields();
-      this.textareaHigh = 4;
+    closeAdd () {
+      this.$refs.addCaseFormRef.resetFields()
+      this.textareaHigh = 4
     },
     // 获取协议列表
-    async getProtocol() {
-      const { data: response } = await this.$http.get("/getAllProtocol");
-      this.protocolsOptions = response.data;
+    async getProtocol () {
+      const { data: response } = await this.$http.get('/getAllProtocol')
+      this.protocolsOptions = response.data
     },
     // 获取项目列表
-    async getProject() {
+    async getProject () {
       this.$common.getAllProject().then(data => {
-        this.projectOptions = data;
-      });
+        this.projectOptions = data
+      })
     },
     // 运行用例
-    async runCaseById(id) {
-      this.loading = true;
-      const { data: response } = await this.$http.get("/runCaseById?id=" + id);
-      this.loading = false;
+    async runCaseById (id) {
+      this.loading = true
+      const { data: response } = await this.$http.get('/runCaseById?id=' + id)
+      this.loading = false
       if (response.code == 10000) {
-        this.$message.success(response.msg);
-        this.caseResult = response.params;
-        this.executeResponseDialog = true;
+        this.$message.success(response.msg)
+        this.caseResult = response.params
+        this.executeResponseDialog = true
       } else {
-        this.$message.error(response.msg);
-        this.caseResult = response.params;
-        this.executeResponseDialog = true;
+        this.$message.error(response.msg)
+        this.caseResult = response.params
+        this.executeResponseDialog = true
       }
     },
-    async getExecuteRecoding(cid) {
-      this.$router.push("/case/executeRecoding/" + cid);
+    async getExecuteRecoding (cid) {
+      this.$router.push('/case/executeRecoding/' + cid)
     },
-    changeProject(id, name) {
-      window.sessionStorage.setItem("projectId", id);
-      window.sessionStorage.setItem("projectName", name);
-      location.reload();
+    changeProject (id, name) {
+      window.sessionStorage.setItem('projectId', id)
+      window.sessionStorage.setItem('projectName', name)
+      location.reload()
     },
-    delProject() {
-      window.sessionStorage.removeItem("projectId");
-      window.sessionStorage.removeItem("projectName");
-      location.reload();
+    delProject () {
+      window.sessionStorage.removeItem('projectId')
+      window.sessionStorage.removeItem('projectName')
+      location.reload()
     }
   },
-  created() {
-    if (window.sessionStorage.getItem("projectId") != null) {
+  created () {
+    if (window.sessionStorage.getItem('projectId') != null) {
       this.queryCaseListParams.projectId = window.sessionStorage.getItem(
-        "projectId"
-      );
-      this.currentProjectName = window.sessionStorage.getItem("projectName");
-      this.currentProjectId = window.sessionStorage.getItem("projectId");
+        'projectId'
+      )
+      this.currentProjectName = window.sessionStorage.getItem('projectName')
+      this.currentProjectId = window.sessionStorage.getItem('projectId')
     }
-    this.getCaseList();
-    this.getProtocol();
-    this.getProject();
+    this.getCaseList()
+    this.getProtocol()
+    this.getProject()
   },
-  beforeRouteLeave(to, from, next) {
-    to.meta.keepAlive = false;
-    next();
+  beforeRouteLeave (to, from, next) {
+    to.meta.keepAlive = false
+    next()
   }
-};
+}
 </script>
 <style lang="less" scoped></style>

@@ -23,10 +23,9 @@
           </el-select>
         </el-col>
 
-
         <el-col :span="3" v-else>
           <el-select disabled clearable v-model="this.$global.currentProjectName" placeholder="请选择所属项目">
-            <el-option 
+            <el-option
               v-for="item in projectOptions"
               :key="item.id"
               :label="item.name"
@@ -48,7 +47,7 @@
           <el-button icon="el-icon-search" @click="getJobCaseGroupListBySelect()"></el-button>
         </el-col>
         <el-col :span="10" style="text-align:right">
-          <el-button type="primary" @click="addJobDialog = true">添加组件</el-button>
+          <el-button type="primary" @click="addJobDialog = true">添加用例集</el-button>
         </el-col>
         <el-col :span="1" style="text-align:right">
           <el-button type="primary" @click="runJob()">运行Job</el-button>
@@ -83,7 +82,7 @@
         <!-- 操作列 -->
         <el-table-column fixed="right" label="最后一次执行结果" width="300">
             <span style="margin-right:20px">执行通过</span>
-            <el-button 
+            <el-button
               type="success"
               icon="el-icon-check"
               plain
@@ -141,7 +140,6 @@
         </el-row>
       </el-form>
 
-
   <span slot="footer" class="dialog-footer">
     <el-button @click="addJobDialog = false">取 消</el-button>
     <el-button type="primary" @click="addCaseGroupToJob()">确 定</el-button>
@@ -151,14 +149,14 @@
 </template>
 <script>
 export default {
-  data() {
+  data () {
     // json校验
     var checkJson = (rule, value, callback) => {
       if (this.isJSON(value)) {
-        return callback();
+        return callback()
       }
-      callback(new Error("JSON格式有误，请检查"));
-    };
+      callback(new Error('JSON格式有误，请检查'))
+    }
     return {
       // 文本域默认高度
       textareaHigh: 5,
@@ -168,140 +166,139 @@ export default {
       projectOptions: [],
       // 查询组件条件数据
       queryJobCaseGroupListParams: {
-        query: "",
+        query: '',
         pageNum: 1,
         pageSize: 10,
-        projectId: this.$global.currentProjectId,
+        projectId: this.$global.currentProjectId
       },
       jobCaseGroupList: [],
       JobCaseGroupTotal: 0,
       //   添加组件第一步表单验证规则的对象
-      
-        // params: [{ validator: checkJson, trigger: "blur" }],
 
-      componentCatrgoryList:"",
-      categorys:[],
-      addJobDialog:false,
-      addJobForm:{},
-      caseGroupList:{
+      // params: [{ validator: checkJson, trigger: "blur" }],
+
+      componentCatrgoryList: '',
+      categorys: [],
+      addJobDialog: false,
+      addJobForm: {},
+      caseGroupList: {
       },
-      addJobFormRules:{
-          id:[
-            { required: true, message: '请选择用例集', trigger: 'blur' },
-          ]
+      addJobFormRules: {
+        id: [
+          { required: true, message: '请选择用例集', trigger: 'blur' }
+        ]
       },
-      queryCaseGroupForm:{
-          query:"",
-          pageNum:1,
-          pageSize:100,
-          projectId:this.$global.currentProjectId
+      queryCaseGroupForm: {
+        query: '',
+        pageNum: 1,
+        pageSize: 100,
+        projectId: this.$global.currentProjectId
       }
-    };
+    }
   },
   methods: {
     //   运行job
-      runJob(){
-        this.$common.get('/runJob');
-        this.$message.success("已手动运行Job，请稍后在邮箱或者任务报告中查看运行结果");
-      },
+    async runJob () {
+      this.$message.success('已手动运行job，请稍后查看邮件。。。')
+      const response = await this.$common.get('/runJob')
+    },
     //   添加job
-    async addCaseGroupToJob(){
-        this.$refs.addJobFormRef.validate(async valid => {
-          if (valid) {
-                const response = await this.$common.get("/addCaseGroupToJob?caseGroupId=" + this.addJobForm.id);
-                if(response.code == 10000){
-                    this.$message.success(response.msg);
-                }else{
-                    this.$message.error(response.msg);
-                }
-                    this.addJobDialog = false;
-                    this.getJobCaseGroupListBySelect();
+    async addCaseGroupToJob () {
+      this.$refs.addJobFormRef.validate(async valid => {
+        if (valid) {
+          const response = await this.$common.get('/addCaseGroupToJob?caseGroupId=' + this.addJobForm.id)
+          if (response.code == 10000) {
+            this.$message.success(response.msg)
+          } else {
+            this.$message.error(response.msg)
           }
-        })  
-        
-   },
-//    查询列表
-    async getCaseGroupList(query){
-        this.queryCaseGroupForm.query = query;
-        const response = await this.$common.get("/getAllCaseGroup",this.queryCaseGroupForm);
-        console.log(response);
-        this.caseGroupList = response.data;
-      },
+          this.addJobDialog = false
+          this.getJobCaseGroupListBySelect()
+        }
+      })
+    },
+    //    查询列表
+    async getCaseGroupList (query) {
+      this.queryCaseGroupForm.query = query
+      const response = await this.$common.get('/getAllCaseGroup', this.queryCaseGroupForm)
+      console.log(response)
+      this.caseGroupList = response.data
+    },
     //   关闭弹窗的操作
-    colseAdd(){
-        this.addJobDialog = false;
-        this.$refs.addJobFormRef.resetFields();
-        this.caseGroupList = {};
-      },
+    colseAdd () {
+      this.addJobDialog = false
+      this.$refs.addJobFormRef.resetFields()
+      this.caseGroupList = {}
+    },
     // 通过查询获取列表
-    async getJobCaseGroupListBySelect() {
-      this.queryJobCaseGroupListParams.pageNum = 1;
-      this.queryJobCaseGroupListParams.pageSize = 10;
-      this.getJobCaseGroupList();
+    async getJobCaseGroupListBySelect () {
+      this.queryJobCaseGroupListParams.pageNum = 1
+      this.queryJobCaseGroupListParams.pageSize = 10
+      this.getJobCaseGroupList()
     },
     // 停用
-    async delJobCaseGroup(row) {
-      const { data: response } = await this.$http.get("/toDelCaseGroupFromJob?id=" + row.id);
+    async delJobCaseGroup (row) {
+      const { data: response } = await this.$http.get('/toDelCaseGroupFromJob?id=' + row.id)
       if (response.code != 10000) {
-        this.$message.error("服务器开小差了，请稍后重试或者联系管理员！");
+        this.$message.error('服务器开小差了，请稍后重试或者联系管理员！')
       }
-      this.getJobCaseGroupListBySelect();
+      this.getJobCaseGroupListBySelect()
     },
     // 改变状态
-    async changeDel(row) {
+    async changeDel (row) {
       // 停用
-        await this.$confirm("是否停用该组件?", "提示", {
-          confirmButtonText: "停用",
-          cancelButtonText: "取消",
-          type: "warning"
+      await this.$confirm('是否停用该组件?', '提示', {
+        confirmButtonText: '停用',
+        cancelButtonText: '取消',
+        type: 'warning'
+      })
+        .then(() => {
+          this.delJobCaseGroup(row)
         })
-          .then(() => {
-            this.delJobCaseGroup(row);
+        .catch(() => {
+          row.del = true
+          this.$message({
+            type: 'info',
+            message: '已取消停用'
           })
-          .catch(() => {
-            row.del = true;
-            this.$message({
-              type: "info",
-              message: "已取消停用"
-            });
-          });
+        })
     },
     // 监听每页显示数的改变
-    handleSizeChange(newSize) {
-      this.queryJobCaseGroupListParams.pageSize = newSize;
-      this.getComponentList();
+    handleSizeChange (newSize) {
+      this.queryJobCaseGroupListParams.pageSize = newSize
+      this.getComponentList()
     },
     // 监听页码的改变
-    handleCurrentChange(newPage) {
-      this.queryJobCaseGroupListParams.pageNum = newPage;
-      this.getComponentList();
+    handleCurrentChange (newPage) {
+      this.queryJobCaseGroupListParams.pageNum = newPage
+      this.getComponentList()
     },
     // 获取project列表
-    async getProject() {
-      const { data: response } = await this.$http.get("/getAllProject");
-      this.projectOptions = response.data;
+    async getProject () {
+      const { data: response } = await this.$http.get('/getAllProject')
+      this.projectOptions = response.data
     },
     // 获取列表
-    async getJobCaseGroupList(){
-        const response = await this.$common.get('/getJobCaseGroup',this.queryJobCaseGroupListParams);
-        console.log(response);
-        this.jobCaseGroupList = response.data;
-        this.JobCaseGroupTotal = response.total;
-    },
-    
-  },
-  created() {
-        if (
-      window.sessionStorage.getItem("projectId") != null &&
-      window.sessionStorage.getItem("projectName") != null
-    ) {
-      this.$global.currentProjectId = window.sessionStorage.getItem("projectId");
-      this.$global.currentProjectName = window.sessionStorage.getItem("projectName");
-      this.queryJobCaseGroupListParams.projectId = this.$global.currentProjectId;
+    async getJobCaseGroupList () {
+      const response = await this.$common.get('/getJobCaseGroup', this.queryJobCaseGroupListParams)
+      console.log(response)
+      this.jobCaseGroupList = response.data
+      this.JobCaseGroupTotal = response.total
     }
-    this.getProject();
-    this.getJobCaseGroupList();
+
+  },
+  created () {
+    if (
+      window.sessionStorage.getItem('projectId') != null &&
+      window.sessionStorage.getItem('projectName') != null
+    ) {
+      this.$global.currentProjectId = window.sessionStorage.getItem('projectId')
+      this.$global.currentProjectName = window.sessionStorage.getItem('projectName')
+      this.queryJobCaseGroupListParams.projectId = this.$global.currentProjectId
+    }
+    this.getProject()
+    this.getJobCaseGroupList()
   }
-};
+}
 </script>
 <style lang="less" scoped></style>

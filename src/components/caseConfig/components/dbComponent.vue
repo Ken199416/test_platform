@@ -156,8 +156,6 @@
           </el-form-item>
         </template>
 
-
-
         <el-form-item label="SQL参数截取">
           <el-switch v-model="switchInfo.isParams"></el-switch>
           <el-button
@@ -202,219 +200,217 @@
 </template>
 <script>
 export default {
-  props: ["cid"],
-  data() {
+  props: ['cid'],
+  data () {
     return {
       loading: false,
       addComponentForm: {
-        categoryId:"4"
+        categoryId: '4'
       },
       keyList: [],
-      valueList:[],
-      sqlId:0,
-      addSQLSelectComponentForm:{
+      valueList: [],
+      sqlId: 0,
+      addSQLSelectComponentForm: {
 
       },
       dataSourceList: [],
       SQLSelectDialogVisible: false,
-      addSQLSelectComponentFormRules:{
-        assertFlag: [{ required: true, message: "请选择断言列", trigger: "blur" }],
+      addSQLSelectComponentFormRules: {
+        assertFlag: [{ required: true, message: '请选择断言列', trigger: 'blur' }],
         assertContent: [
-          { required: true, message: "请输入预期断言", trigger: "blur" }
+          { required: true, message: '请输入预期断言', trigger: 'blur' }
         ]
       },
       addComponentFormRules: {
-        name: [{ required: true, message: "请输入组件名称", trigger: "blur" }],
+        name: [{ required: true, message: '请输入组件名称', trigger: 'blur' }],
         dataSourceId: [
-          { required: true, message: "请选择数据源", trigger: "blur" }
+          { required: true, message: '请选择数据源', trigger: 'blur' }
         ],
         sqlContent: [
-          { required: true, message: "请输入SQL语句", trigger: "blur" }
+          { required: true, message: '请输入SQL语句', trigger: 'blur' }
         ],
         projectId: [
-          { required: true, message: "请选择项目", trigger: "blur" }
+          { required: true, message: '请选择项目', trigger: 'blur' }
         ]
       },
       projectList: [],
       componentList: [],
       categoryId: 4,
-      addSQLSelectForm:{
+      addSQLSelectForm: {
 
-          assertDomains: [{
-            name:'',
-            value: ''
-          }]
-        ,
-          paramsDomains: [{
-            name:'',
-            value: '',
-            desc:''
-          }]
+        assertDomains: [{
+          name: '',
+          value: ''
+        }],
+        paramsDomains: [{
+          name: '',
+          value: '',
+          desc: ''
+        }]
       },
-      switchInfo:{
-        isAssert:false,
-        isParams:false
+      switchInfo: {
+        isAssert: false,
+        isParams: false
       },
-      addSQLSelectRules:{}
-    };
+      addSQLSelectRules: {}
+    }
   },
   methods: {
-      removeParamsDomain(item) {
-        var index = this.addSQLSelectForm.paramsDomains.indexOf(item)
-        if (index !== -1) {
-          this.addSQLSelectForm.paramsDomains.splice(index, 1)
-        }
-      },
-      addParamsDomain() {
-        this.addSQLSelectForm.paramsDomains.push({
-          name:'',
-          value: '',
-          desc:'',
-          key: Date.now()
-        });
-      },
-
-      removeAssertDomain(item) {
-        var index = this.addSQLSelectForm.assertDomains.indexOf(item)
-        if (index !== -1) {
-          this.addSQLSelectForm.assertDomains.splice(index, 1)
-        }
-      },
-      addAssertDomain() {
-        this.addSQLSelectForm.assertDomains.push({
-          name:'',
-          value: '',
-          key: Date.now()
-        });
-      },
-    async addSqlSelectComponent() {
-      let assertFlag = '';
-      let assertContent = '';
-      if(this.switchInfo.isAssert){
-        for(let i=0 ; i< this.addSQLSelectForm.assertDomains.length ;i++){
-        assertFlag += this.addSQLSelectForm.assertDomains[i].name + '<==>';
-        assertContent += this.addSQLSelectForm.assertDomains[i].value  + "<==>";
-        }
-      assertFlag = assertFlag.substring(0,assertFlag.length-4);   
-      assertContent = assertContent.substring(0,assertContent.length-4);
+    removeParamsDomain (item) {
+      var index = this.addSQLSelectForm.paramsDomains.indexOf(item)
+      if (index !== -1) {
+        this.addSQLSelectForm.paramsDomains.splice(index, 1)
       }
-      let referenceParamFlag = '';
-      let referenceParamContent = '';
-      let referenceParamDesc = "";
-      if(this.switchInfo.isParams){
-        for(let i=0 ; i< this.addSQLSelectForm.paramsDomains.length ;i++){
-        referenceParamFlag += this.addSQLSelectForm.paramsDomains[i].name + '<==>';
-        referenceParamContent += this.addSQLSelectForm.paramsDomains[i].value  + "<==>";
-        referenceParamDesc += this.addSQLSelectForm.paramsDomains[i].desc + "<==>"
-        }
-      referenceParamFlag = referenceParamFlag.substring(0,referenceParamFlag.length-4);
-      referenceParamContent = referenceParamContent.substring(0,referenceParamContent.length-4);
-      referenceParamDesc = referenceParamDesc.substring(0,referenceParamDesc.length-4);
-      }
-      this.addSQLSelectComponentForm.assertFlag = assertFlag;
-      this.addSQLSelectComponentForm.assertContent = assertContent;
-      this.addSQLSelectComponentForm.referenceParamFlag = referenceParamFlag;
-      this.addSQLSelectComponentForm.referenceParamContent = referenceParamContent;
-      this.addSQLSelectComponentForm.referenceParamDesc = referenceParamDesc;
-      console.log(this.addSQLSelectComponentForm);
-      this.$common.post("/addSqlSelectComponent",this.addSQLSelectComponentForm);
-      // 每写完，暂时暂不写这个功能
-
     },
-    getSQLDate() {
+    addParamsDomain () {
+      this.addSQLSelectForm.paramsDomains.push({
+        name: '',
+        value: '',
+        desc: '',
+        key: Date.now()
+      })
+    },
+
+    removeAssertDomain (item) {
+      var index = this.addSQLSelectForm.assertDomains.indexOf(item)
+      if (index !== -1) {
+        this.addSQLSelectForm.assertDomains.splice(index, 1)
+      }
+    },
+    addAssertDomain () {
+      this.addSQLSelectForm.assertDomains.push({
+        name: '',
+        value: '',
+        key: Date.now()
+      })
+    },
+    async addSqlSelectComponent () {
+      let assertFlag = ''
+      let assertContent = ''
+      if (this.switchInfo.isAssert) {
+        for (let i = 0; i < this.addSQLSelectForm.assertDomains.length; i++) {
+          assertFlag += this.addSQLSelectForm.assertDomains[i].name + '<==>'
+          assertContent += this.addSQLSelectForm.assertDomains[i].value + '<==>'
+        }
+        assertFlag = assertFlag.substring(0, assertFlag.length - 4)
+        assertContent = assertContent.substring(0, assertContent.length - 4)
+      }
+      let referenceParamFlag = ''
+      let referenceParamContent = ''
+      let referenceParamDesc = ''
+      if (this.switchInfo.isParams) {
+        for (let i = 0; i < this.addSQLSelectForm.paramsDomains.length; i++) {
+          referenceParamFlag += this.addSQLSelectForm.paramsDomains[i].name + '<==>'
+          referenceParamContent += this.addSQLSelectForm.paramsDomains[i].value + '<==>'
+          referenceParamDesc += this.addSQLSelectForm.paramsDomains[i].desc + '<==>'
+        }
+        referenceParamFlag = referenceParamFlag.substring(0, referenceParamFlag.length - 4)
+        referenceParamContent = referenceParamContent.substring(0, referenceParamContent.length - 4)
+        referenceParamDesc = referenceParamDesc.substring(0, referenceParamDesc.length - 4)
+      }
+      this.addSQLSelectComponentForm.assertFlag = assertFlag
+      this.addSQLSelectComponentForm.assertContent = assertContent
+      this.addSQLSelectComponentForm.referenceParamFlag = referenceParamFlag
+      this.addSQLSelectComponentForm.referenceParamContent = referenceParamContent
+      this.addSQLSelectComponentForm.referenceParamDesc = referenceParamDesc
+      console.log(this.addSQLSelectComponentForm)
+      this.$common.post('/addSqlSelectComponent', this.addSQLSelectComponentForm)
+      // 每写完，暂时暂不写这个功能
+    },
+    getSQLDate () {
       // 表单校验
       this.$refs.addComponentFormRef.validate(async valid => {
         if (valid) {
-          this.loading = true;
+          this.loading = true
           // 获取请求Token接口响应信息
           const response = await this.$common.post(
-            "/sqlSelect",
+            '/sqlSelect',
             this.addComponentForm
-          );
-          this.loading = false;
-          this.keyList = response.data.key;
-          this.valueList = response.data.value;
-          this.addSQLSelectComponentForm = response.total;
-          this.loading = false;
-          this.SQLSelectDialogVisible = true;
+          )
+          this.loading = false
+          this.keyList = response.data.key
+          this.valueList = response.data.value
+          this.addSQLSelectComponentForm = response.total
+          this.loading = false
+          this.SQLSelectDialogVisible = true
         } else {
-          console.log("表单校验码不通过");
+          console.log('表单校验码不通过')
         }
-      });
+      })
     },
-    async getAllProject() {
-      const data = await this.$common.getAllProject();
-      this.projectList = data;
+    async getAllProject () {
+      const data = await this.$common.getAllProject()
+      this.projectList = data
     },
-    backFitst() {
-      this.lookHeaderAndResponseDialog = false;
+    backFitst () {
+      this.lookHeaderAndResponseDialog = false
     },
     //   关闭时操作
-    closeEditDialog() {
+    closeEditDialog () {
       // this.$refs.addComponentFormRules.resetFields();
     },
-    getComponentInfo() {
+    getComponentInfo () {
       this.$common.getComponentInfoById(this.cid).then(data => {
-        this.componentInfo = data;
-      });
+        this.componentInfo = data
+      })
     },
-    async editGetHeaderAndCookie() {
+    async editGetHeaderAndCookie () {
       this.$refs.editCaseFormRef.validate(async valid => {
         if (valid) {
           const { data: response } = await this.$http.post(
-            "/getHeaderAndCookie",
+            '/getHeaderAndCookie',
             this.componentInfo
-          );
+          )
           if (response.code == 10000) {
-            this.componentInfo = response.data;
-            this.lookHeaderAndResponseDialog = true;
+            this.componentInfo = response.data
+            this.lookHeaderAndResponseDialog = true
           } else {
-            this.$message.error(response.msg);
+            this.$message.error(response.msg)
           }
         }
-      });
+      })
     },
-    back() {
-      this.$router.push("/caseConfig/component");
+    back () {
+      this.$router.push('/caseConfig/component')
     },
-    async editComponent() {
+    async editComponent () {
       this.$refs.lookHeaderAndResponseRef.validate(async valid => {
         if (valid) {
           const { data: response } = await this.$http.post(
-            "/editComponent",
+            '/editComponent',
             this.componentInfo
-          );
+          )
           if (response.code == 10000) {
-            this.$message.success(response.msg);
-            this.$router.push("/caseConfig/component");
+            this.$message.success(response.msg)
+            this.$router.push('/caseConfig/component')
           } else {
-            this.$message.error(response.mag);
+            this.$message.error(response.mag)
           }
         } else {
         }
-      });
+      })
     },
-    async getComponentList() {
-      const data = await this.$common.getAllComponent();
-      this.componentList = data;
+    async getComponentList () {
+      const data = await this.$common.getAllComponent()
+      this.componentList = data
     },
-    async getAllDataSource() {
-      this.dataSourceList = await this.$common.getAllDataSource();
+    async getAllDataSource () {
+      this.dataSourceList = await this.$common.getAllDataSource()
     }
   },
-  created() {
+  created () {
     if (
-      window.sessionStorage.getItem("projectId") != null &&
-      window.sessionStorage.getItem("projectName") != null
+      window.sessionStorage.getItem('projectId') != null &&
+      window.sessionStorage.getItem('projectName') != null
     ) {
-      this.$global.currentProjectId = window.sessionStorage.getItem("projectId");
-      this.$global.currentProjectName = window.sessionStorage.getItem("projectName");
-      this.addComponentForm.projectId = this.$global.currentProjectId;
+      this.$global.currentProjectId = window.sessionStorage.getItem('projectId')
+      this.$global.currentProjectName = window.sessionStorage.getItem('projectName')
+      this.addComponentForm.projectId = this.$global.currentProjectId
     }
-    this.getAllProject();
-    this.getComponentList();
-    this.getAllDataSource();
+    this.getAllProject()
+    this.getComponentList()
+    this.getAllDataSource()
   }
-};
+}
 </script>
 <style lang="less" scoped></style>
