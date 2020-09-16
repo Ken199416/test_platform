@@ -46,11 +46,11 @@
         <el-col :span="5">
           <el-button icon="el-icon-search" @click="getJobCaseGroupListBySelect()"></el-button>
         </el-col>
-        <el-col :span="10" style="text-align:right">
+        <el-col :span="9" style="text-align:right">
           <el-button type="primary" @click="addJobDialog = true">添加用例集</el-button>
         </el-col>
-        <el-col :span="1" style="text-align:right">
-          <el-button type="primary" @click="runJob()">运行Job</el-button>
+        <el-col :span="2" style="text-align:right">
+          <el-button type="primary" @click="jobManage">JOB执行器管理</el-button>
         </el-col>
       </el-row>
 
@@ -81,12 +81,13 @@
         </el-table-column>
         <!-- 操作列 -->
         <el-table-column fixed="right" label="最后一次执行结果" width="300">
-            <span style="margin-right:20px">执行通过</span>
+            <!-- <span style="margin-right:20px">执行通过</span>
             <el-button
               type="success"
               icon="el-icon-check"
               plain
-            ></el-button>
+            ></el-button> -->
+            <el-link type="primary" href="http://www.xxl-job.haomingjian.top/xxl-job-admin/joblog" target='_blank'>查看运行结果</el-link>
         </el-table-column>
       </el-table>
 
@@ -198,9 +199,11 @@ export default {
   },
   methods: {
     //   运行job
-    async runJob () {
-      this.$message.success('已手动运行job，请稍后查看邮件。。。')
-      const response = await this.$common.get('/runJob')
+    async jobManage () {
+      // this.$message.success('已手动运行job，请稍后查看邮件。。。')
+      // window.location.href='http://www.xxl-job.haomingjian.top/xxl-job-admin/jobinfo';
+      window.open("http://www.xxl-job.haomingjian.top/xxl-job-admin/jobinfo");
+      // const response = await this.$common.get('/runJob')
     },
     //   添加job
     async addCaseGroupToJob () {
