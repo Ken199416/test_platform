@@ -4,7 +4,8 @@
     <el-breadcrumb>
       <el-breadcrumb-item :to="{ path: '/' }">首页</el-breadcrumb-item>
       <el-breadcrumb-item>用例管理</el-breadcrumb-item>
-      <el-breadcrumb-item>{{cid == 'add'? '添加':'编辑'}}单接口</el-breadcrumb-item>
+      <el-breadcrumb-item>单接口用例</el-breadcrumb-item>
+      <el-breadcrumb-item>{{cid == 'add'? '添加':'编辑'}}</el-breadcrumb-item>
     </el-breadcrumb>
     <!-- 卡片区域 -->
     <el-card>

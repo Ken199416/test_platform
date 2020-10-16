@@ -161,18 +161,18 @@
           >
             <!-- {{ item.content }} -->
         <keep-alive>
-          <!-- <router-view v-if="$route.meta.keepAlive"></router-view> -->
-          <router-view></router-view>
+          <router-view v-if="$route.meta.keepAlive"></router-view>
+          <!-- <router-view></router-view> -->
         </keep-alive>
-        <!-- <router-view v-if="!$route.meta.keepAlive"></router-view> -->
+        <router-view v-if="!$route.meta.keepAlive"></router-view>
         <!-- <keep-alive>
           <router-view></router-view>
         </keep-alive> -->
           </el-tab-pane>
         </el-tabs>
-        <keep-alive v-if="$route.path === '/welcome'">
+        <!-- <keep-alive v-if="$route.path === '/welcome'"> -->
           <router-view v-if="$route.path === '/welcome'"></router-view>
-        </keep-alive>
+        <!-- </keep-alive> -->
         <!-- <router-view v-if="$route.path === '/welcome'"></router-view> -->
         <!-- 通用底部 -->
         <div style="margin-top: 50px; margin-left: 45%">
@@ -234,6 +234,8 @@ export default {
       console.log(this.currentTab.path);
     },
     addTab(targetName,contentName) {
+      // this.editableTabs = window.sessionStorage.getItem('editableTabs');
+      // this.editableTabsValue = window.sessionStorage.getItem('editableTabsValue');
       if(this.editableTabs.findIndex(tab => tab.title === contentName) == -1){
         // 如果不存在，再添加
         let newTabName = ++this.tabIndex + '';
@@ -249,6 +251,8 @@ export default {
         // console.log(this.editableTabs.filter(tab => tab.title === contentName)[0].name);
         
       }
+      // window.sessionStorage.setItem("editableTabs",this.editableTabs);
+      // window.sessionStorage,setItem("editableTabsValue",this.editableTabsValue);
       },
       removeTab(targetName) {
         let tabs = this.editableTabs;
@@ -269,6 +273,8 @@ export default {
         if(this.editableTabs.length === 0){
           this.$router.push("/welcome")
         }
+        // window.sessionStorage.setItem("editableTabs",this.editableTabs);
+        // window.sessionStorage.setItem("editableTabsValue",this.editableTabsValue);
       }
     ,
     callMe() {
@@ -335,6 +341,8 @@ export default {
   created() {
     this.getMenu();
     this.getLastMenu();
+    // window.sessionStorage.setItem('editableTabs',[]);
+    // window.sessionStorage.setItem('editableTabsValue','');
     if (
       window.sessionStorage.getItem("projectId") != null &&
       window.sessionStorage.getItem("projectName") != null

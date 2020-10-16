@@ -58,7 +58,7 @@ const routes = [
         component: SingleCaseAction,
         props: true,
         meta: {
-          keepAlive: true
+          keepAlive: false
         }
       },
       {
@@ -80,7 +80,7 @@ const routes = [
         component: ExecuteRecoding,
         props: true,
         meta: {
-          keepAlive: true
+          keepAlive: false
         }
       },
 
