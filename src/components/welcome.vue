@@ -5,7 +5,9 @@
 </template>
 <script>
 export default {
-
+    created(){
+        console.log('进入首页');
+    }
 }
 </script>
 <style lang="less" scoped>

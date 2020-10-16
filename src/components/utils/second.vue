@@ -26,6 +26,18 @@
       </el-row>
     </el-card>
 
+    <el-dialog
+  title="S-WORKS共享管理"
+  :visible.sync="sworksDialog"
+  width="80%"
+  :before-close="handleClose">
+  <span>这是一段信息</span>
+  <span slot="footer" class="dialog-footer">
+    <el-button @click="sworksDialog = false">取 消</el-button>
+    <el-button type="primary" @click="sworksDialog = false">确 定</el-button>
+  </span>
+</el-dialog>
+
   </div>
 </template>
 <script>
@@ -33,7 +45,8 @@ export default {
   data () {
     return {
       projectList: [],
-      privateUtilsList: []
+      privateUtilsList: [],
+      sworksDialog: false
     }
   },
   methods: {
@@ -50,8 +63,14 @@ export default {
     async openUtilsDialog (id) {
       // 通过id去后端拿这个dialog的信息，一些title等的详细信息
       // 然后打开dialog弹窗
-
+      if(id==2){
+        // s-works
+        this.sworksDialog = true
     }
+  },
+  handleClose(){
+
+  }
 
   },
   created () {

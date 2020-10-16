@@ -9,6 +9,9 @@ import axios from 'axios'
 // 导入通用js
 import common from './CommonFunction/common.js'
 import global from './CommonFunction/global.js'
+// 导入echarts
+import echarts from 'echarts'
+// // import echarts from './plugins/echarts'
 // import draggable from 'vuedraggable' //拖拽插件
 // import JsonViewer from 'vue-json-viewer'  //JSON插件
 // axios.defaults.baseURL = 'http://hmj.mbg17.cn:8888/autoTest/platform'
@@ -38,6 +41,7 @@ Vue.prototype.$http = axios
 Vue.prototype.$common = common
 Vue.prototype.$global = global
 Vue.config.productionTip = false
+Vue.prototype.echarts = echarts
 
 const vm = new Vue({
   router,

@@ -547,7 +547,7 @@ export default {
         return true
       }
     },
-    async queryAssert (idnex, value) {
+    async queryAssert (index, value) {
       this.queryAssertParams.flag = value
       this.queryAssertParams.content = this.responseStr
       const response = await this.$common.post(
@@ -556,7 +556,16 @@ export default {
       )
       if (response.code == 10000) {
         this.assertResult = response.data
-        this.assertResultIndex = idnex
+        this.assertResultIndex = index
+        // this.domains[index].paramValue = response.data
+        // console.log(index-1)
+        // this.setAssertCaseForm.paramsDomains.splice(index,1,{
+        //   assertResult: false,
+        //   nameValue: value,
+        //   paramDesc:'',
+        //   paramValue: this.assertResult,
+        // })
+        // console.log(this.setAssertCaseForm.assertDomains)
       } else {
         this.$message.error('断言表达式错误，请检查！')
       }

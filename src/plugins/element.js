@@ -3,7 +3,7 @@ import {
   Button, Form, FormItem, Input, Message, Container, Header, Aside, Main, Menu,
   Submenu, MenuItemGroup, MenuItem, Breadcrumb, BreadcrumbItem, Card, Row,
   Col, Table, TableColumn, Switch, Tooltip, Pagination, Dialog, MessageBox, Tag, Select
-  , Option, Loading, DatePicker, Drawer, Popover, Steps, Step,Upload ,Link
+  , Option, Loading, DatePicker, Drawer, Popover, Steps, Step,Upload ,Link ,Tabs,TabPane
 } from 'element-ui'
 
 Vue.use(Button)
@@ -40,6 +40,8 @@ Vue.use(Steps)
 Vue.use(Step)
 Vue.use(Upload)
 Vue.use(Link)
+Vue.use(Tabs)
+Vue.use(TabPane)
 Vue.prototype.$confirm = MessageBox.confirm
 Vue.prototype.$alert = MessageBox.alert
 Vue.prototype.$message = Message

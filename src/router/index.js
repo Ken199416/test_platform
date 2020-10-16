@@ -21,6 +21,7 @@ import ConfigUserInfo from './../components/config/user/userInfo.vue'
 import ExecuteRecoding from './../components/case/executeRecoding.vue'
 import AddSQLSelectComponent from './../components/caseConfig/components/dbComponent.vue'
 import SingleCaseAction from './../components/case/caseAction/singleCaseAction.vue'
+import SWorks from './../components/sworks.vue'
 
 Vue.use(VueRouter)
 
@@ -46,11 +47,18 @@ const routes = [
         }
       },
       {
+        path: '/sworks',
+        component: SWorks,
+        meta: {
+          keepAlive: true
+        }
+      },
+      {
         path: '/case/single/action/:cid',
         component: SingleCaseAction,
         props: true,
         meta: {
-          keepAlive: false
+          keepAlive: true
         }
       },
       {
@@ -72,7 +80,7 @@ const routes = [
         component: ExecuteRecoding,
         props: true,
         meta: {
-          keepAlive: false
+          keepAlive: true
         }
       },
 
@@ -102,14 +110,14 @@ const routes = [
         path: '/caseConfig/component',
         component: CaseConfigComponent,
         meta: {
-          keepAlive: false
+          keepAlive: true
         }
       },
       {
         path: '/caseConfig/component/sqlSelectComponent',
         component: AddSQLSelectComponent,
         meta: {
-          keepAlive: false
+          keepAlive: true
         }
       },
       {
